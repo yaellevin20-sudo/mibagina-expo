@@ -6,7 +6,8 @@
     "group_selector_placeholder": "בחר קבוצה"
   },
   "playground": {
-    "did_you_mean": "התכוונת ל-{{name}}?"
+    "did_you_mean": "התכוונת ל-{{name}}?",
+    "name_too_generic": "אנא הכנס שם ספציפי יותר"
   },
   "checkin": {
     "leaving": "יוצאים",
@@ -18,14 +19,37 @@
   "children": {
     "siblings_collapsed": "+ {{count}} אחים/אחיות",
     "add_child": "הוסף ילד",
+    "add_child_title": "הוסף ילד",
     "remove_child": "הסר ילד",
-    "sees_checkins": "רואה את הצ'ק אינים שלך"
+    "sees_checkins": "רואה את הצ'ק אינים שלך",
+    "no_children": "עדיין אין ילדים. הוסף את הילד הראשון שלך!",
+    "first_name": "שם פרטי",
+    "last_name": "שם משפחה",
+    "date_of_birth": "תאריך לידה",
+    "date_of_birth_hint": "YYYY-MM-DD",
+    "confirm_remove": "להסיר את {{name}}?",
+    "years_old": "בן/בת {{age}}"
   },
   "groups": {
     "create": "צור קבוצה",
+    "create_group_title": "צור קבוצה",
     "join": "הצטרף לקבוצה",
     "invite_link": "קישור הזמנה",
-    "regenerate_invite": "חדש קישור"
+    "regenerate_invite": "חדש קישור",
+    "no_groups": "עדיין אין קבוצות. צור קבוצה!",
+    "group_name": "שם קבוצה",
+    "members_count_one": "חבר אחד",
+    "members_count_other": "{{count}} חברים",
+    "share_invite": "שתף קישור",
+    "rename": "שנה שם",
+    "rename_title": "שנה שם קבוצה",
+    "view_members": "חברי קבוצה",
+    "leave_group": "עזוב קבוצה",
+    "confirm_remove_guardian": "להסיר את {{name}} מהקבוצה?",
+    "confirm_remove_child": "להסיר את {{name}} מהקבוצה?",
+    "confirm_regenerate": "לחדש את קישור ההזמנה? הקישור הנוכחי יפסיק לעבוד.",
+    "last_admin_error": "לא ניתן להסיר את המנהל האחרון — מנה מנהל אחר תחילה",
+    "admin_badge": "מנהל"
   },
   "auth": {
     "email": "אימייל",
@@ -51,9 +75,17 @@
     "merge_confirm": "כן, זה אותו ילד",
     "merge_decline": "לא, ילד חדש"
   },
-  "playground": {
-    "did_you_mean": "התכוונת ל-{{name}}?",
-    "name_too_generic": "אנא הכנס שם ספציפי יותר"
+  "nav": {
+    "home": "בית",
+    "children": "ילדים",
+    "groups": "קבוצות",
+    "profile": "פרופיל"
+  },
+  "common": {
+    "cancel": "ביטול",
+    "save": "שמור",
+    "confirm": "אישור",
+    "loading": "טוען..."
   },
   "errors": {
     "generic": "אירעה שגיאה. אנא נסה שוב.",

@@ -6,7 +6,8 @@
     "group_selector_placeholder": "Select a group"
   },
   "playground": {
-    "did_you_mean": "Did you mean {{name}}?"
+    "did_you_mean": "Did you mean {{name}}?",
+    "name_too_generic": "Please enter a more specific name"
   },
   "checkin": {
     "leaving": "Leaving",
@@ -18,14 +19,37 @@
   "children": {
     "siblings_collapsed": "+ {{count}} sibling(s)",
     "add_child": "Add child",
+    "add_child_title": "Add child",
     "remove_child": "Remove child",
-    "sees_checkins": "Sees your check-ins"
+    "sees_checkins": "Sees your check-ins",
+    "no_children": "No children yet. Add your first child!",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "date_of_birth": "Date of birth",
+    "date_of_birth_hint": "YYYY-MM-DD",
+    "confirm_remove": "Remove {{name}}?",
+    "years_old": "Age {{age}}"
   },
   "groups": {
     "create": "Create group",
+    "create_group_title": "Create group",
     "join": "Join group",
     "invite_link": "Invite link",
-    "regenerate_invite": "Regenerate link"
+    "regenerate_invite": "Regenerate link",
+    "no_groups": "No groups yet. Create one!",
+    "group_name": "Group name",
+    "members_count_one": "1 member",
+    "members_count_other": "{{count}} members",
+    "share_invite": "Share invite",
+    "rename": "Rename",
+    "rename_title": "Rename group",
+    "view_members": "View members",
+    "leave_group": "Leave group",
+    "confirm_remove_guardian": "Remove {{name}} from this group?",
+    "confirm_remove_child": "Remove {{name}} from this group?",
+    "confirm_regenerate": "Regenerate invite link? The current link will stop working.",
+    "last_admin_error": "Cannot remove the last admin — assign another admin first",
+    "admin_badge": "Admin"
   },
   "auth": {
     "email": "Email",
@@ -51,9 +75,17 @@
     "merge_confirm": "Yes, same child",
     "merge_decline": "No, different child"
   },
-  "playground": {
-    "did_you_mean": "Did you mean {{name}}?",
-    "name_too_generic": "Please enter a more specific name"
+  "nav": {
+    "home": "Home",
+    "children": "Children",
+    "groups": "Groups",
+    "profile": "Profile"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirm": "Confirm",
+    "loading": "Loading..."
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
