@@ -41,3 +41,6 @@ yarn-error.*
 /ios
 /android
 supabase/.temp
+
+# Contains embedded secrets — apply with supabase db push but do not commit
+supabase/migrations/*_cron_jobs.sql
