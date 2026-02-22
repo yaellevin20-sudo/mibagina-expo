@@ -65,10 +65,26 @@ export type CheckinResult = {
   check_ins: CheckinRow[];
 };
 
+export type HomeNamedChild = {
+  child_id: string;
+  first_name: string;
+  age_years: number;
+  check_in_id: string;
+  posted_by: string;
+};
+
+export type HomeFeedItem = {
+  playground_id: string;
+  playground_name: string;
+  named: HomeNamedChild[];
+  anonymous_ages: number[];
+};
+
 export type NamedChild = {
   child_id: string;
   first_name: string;
   age_years: number;
+  posted_by: string; // Added Phase 7: needed for sibling grouping
 };
 
 export type PlaygroundChildrenResult = {
@@ -221,6 +237,20 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
   const { data, error } = await supabase.rpc('get_group_members', { p_group_id: groupId });
   if (error) throw error;
   return data as GroupMember[];
+}
+
+// -----------------------------------------------------------------------
+// get_group_active_checkins(p_group_id) — Phase 7 home feed
+// Returns active check-ins for children in the group, by playground.
+// co_guardian_visibility enforced server-side.
+// Throws 'Access denied' if viewer is not in the group.
+// -----------------------------------------------------------------------
+export async function getGroupActiveCheckins(groupId: string): Promise<HomeFeedItem[]> {
+  const { data, error } = await supabase.rpc('get_group_active_checkins', {
+    p_group_id: groupId,
+  });
+  if (error) throw error;
+  return data as HomeFeedItem[];
 }
 
 // -----------------------------------------------------------------------

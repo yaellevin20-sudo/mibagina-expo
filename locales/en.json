@@ -1,11 +1,18 @@
 {
   "home": {
+    "title": "Who's at the playground?",
     "empty_state": "No one at the playground yet. Be the first!",
     "still_there_prompt": "Still there?",
     "no_one_here": "No one here right now",
-    "group_selector_placeholder": "Select a group"
+    "no_groups": "You have no groups yet. Create one or join one!",
+    "group_selector_placeholder": "Select a group",
+    "anonymous_age": "Age {{age}} (anonymous)",
+    "collapse_siblings": "Collapse"
   },
   "playground": {
+    "title": "Who's here?",
+    "who_is_here": "Here now",
+    "also_here": "Also here",
     "did_you_mean": "Did you mean {{name}}?",
     "name_too_generic": "Please enter a more specific name"
   },

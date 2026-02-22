@@ -1,11 +1,18 @@
 {
   "home": {
+    "title": "מי בגינה?",
     "empty_state": "עדיין אף אחד בגן. תהיו ראשונים!",
     "still_there_prompt": "עדיין שם?",
     "no_one_here": "אף אחד כאן עכשיו",
-    "group_selector_placeholder": "בחר קבוצה"
+    "no_groups": "אין לך קבוצות עדיין. צור קבוצה או הצטרף לאחת!",
+    "group_selector_placeholder": "בחר קבוצה",
+    "anonymous_age": "גיל {{age}} (אנונימי)",
+    "collapse_siblings": "הסתר"
   },
   "playground": {
+    "title": "מי בגינה?",
+    "who_is_here": "נמצאים כאן",
+    "also_here": "גם כאן",
     "did_you_mean": "התכוונת ל-{{name}}?",
     "name_too_generic": "אנא הכנס שם ספציפי יותר"
   },
