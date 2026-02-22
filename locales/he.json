@@ -1,0 +1,65 @@
+{
+  "home": {
+    "empty_state": "עדיין אף אחד בגן. תהיו ראשונים!",
+    "still_there_prompt": "עדיין שם?",
+    "no_one_here": "אף אחד כאן עכשיו",
+    "group_selector_placeholder": "בחר קבוצה"
+  },
+  "playground": {
+    "did_you_mean": "התכוונת ל-{{name}}?"
+  },
+  "checkin": {
+    "leaving": "יוצאים",
+    "still_there": "עדיין פה",
+    "select_children": "בחר ילדים",
+    "select_playground": "בחר גינה",
+    "submit": "צ'ק אין"
+  },
+  "children": {
+    "siblings_collapsed": "+ {{count}} אחים/אחיות",
+    "add_child": "הוסף ילד",
+    "remove_child": "הסר ילד",
+    "sees_checkins": "רואה את הצ'ק אינים שלך"
+  },
+  "groups": {
+    "create": "צור קבוצה",
+    "join": "הצטרף לקבוצה",
+    "invite_link": "קישור הזמנה",
+    "regenerate_invite": "חדש קישור"
+  },
+  "auth": {
+    "email": "אימייל",
+    "password": "סיסמה",
+    "login": "התחברות",
+    "signup": "הרשמה",
+    "logout": "התנתקות",
+    "display_name": "שם תצוגה",
+    "display_name_placeholder": "איך תרצה שיקראו לך?",
+    "email_verification_required": "יש לאמת את כתובת האימייל לפני ההצטרפות לקבוצות"
+  },
+  "profile": {
+    "title": "הפרופיל שלי",
+    "change_email": "שנה אימייל",
+    "change_password": "שנה סיסמה",
+    "delete_account": "מחק חשבון",
+    "delete_confirm": "האם אתה בטוח שברצונך למחוק את החשבון?"
+  },
+  "join": {
+    "title": "הצטרף לקבוצה",
+    "select_children": "בחר אילו ילדים להוסיף",
+    "duplicate_prompt": "האם הילד {{name}} ({{year}}) כבר קיים?",
+    "merge_confirm": "כן, זה אותו ילד",
+    "merge_decline": "לא, ילד חדש"
+  },
+  "playground": {
+    "did_you_mean": "התכוונת ל-{{name}}?",
+    "name_too_generic": "אנא הכנס שם ספציפי יותר"
+  },
+  "errors": {
+    "generic": "אירעה שגיאה. אנא נסה שוב.",
+    "daily_limit": "הגעת למגבלת הצ'ק אינים היומית",
+    "not_authenticated": "יש להתחבר כדי להמשיך",
+    "access_denied": "אין לך גישה לתוכן זה",
+    "email_in_use": "כתובת האימייל כבר בשימוש"
+  }
+}
