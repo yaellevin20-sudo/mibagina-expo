@@ -10,6 +10,7 @@ import {
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { getMyProfile, updateDisplayName, deleteMyAccount, type ProfileData } from '../../lib/db/rpc';
 import { signOut, changePassword } from '../../lib/auth';
@@ -240,6 +241,7 @@ function ChangePasswordModal({
 // ---------------------------------------------------------------------------
 export default function ProfileScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -250,6 +252,11 @@ export default function ProfileScreen() {
   const load = useCallback(async () => {
     try {
       const data = await getMyProfile();
+      if (!data) {
+        // Guardian row missing — send to name screen to recreate it
+        router.replace('/(auth)/name');
+        return;
+      }
       setProfile(data);
     } catch (e: any) {
       Alert.alert(t('errors.generic'), e.message);
