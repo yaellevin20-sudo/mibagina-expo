@@ -1,7 +1,7 @@
 import '../global.css';
 import '../lib/i18n';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { I18nManager } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -37,6 +37,7 @@ function RootNavigator() {
   const router = useRouter();
 
   const [pendingPrompt, setPendingPrompt] = useState<StillTherePayload | null>(null);
+  const coldStartHandled = useRef(false);
 
   // Handle deep link tokens (OAuth callback fallback + recovery tokens on Android)
   const url = Linking.useURL();
@@ -81,9 +82,14 @@ function RootNavigator() {
       if (!d) return;
       if (d.type === 'still_there_prompt') setPendingPrompt(d as StillTherePayload);
       if (d.type === 'group_checkin') {
+        const payload = d as GroupCheckinPayload;
         Toast.show({
           text1: n.request.content.title ?? '',
           text2: n.request.content.body ?? '',
+          onPress: () => {
+            Toast.hide();
+            router.push(`/playground/${payload.playground_id}`);
+          },
         });
       }
     });
@@ -103,9 +109,12 @@ function RootNavigator() {
     return () => sub.remove();
   }, []);
 
-  // 3. Cold-start: user tapped notification, app was killed — wait for session
+  // 3. Cold-start: user tapped notification, app was killed — wait for session.
+  // Guard with a ref so this only runs once — session can change (refresh, re-login)
+  // and re-processing a stale notification would show phantom modals.
   useEffect(() => {
-    if (!session) return;
+    if (!session || coldStartHandled.current) return;
+    coldStartHandled.current = true;
     Notifications.getLastNotificationResponseAsync().then((r) => {
       if (!r) return;
       const d = r.notification.request.content.data as StillTherePayload | GroupCheckinPayload | undefined;
