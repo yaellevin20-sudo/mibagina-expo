@@ -34,6 +34,7 @@ export type MyGroupChild = {
 export type GroupRow = {
   id: string;
   name: string;
+  emoji: string | null;
   invite_token: string;
   expires_at: string | null;
   created_at: string;
@@ -246,6 +247,15 @@ export async function createGroup(name: string): Promise<string> {
 // -----------------------------------------------------------------------
 export async function renameGroup(groupId: string, name: string): Promise<void> {
   const { error } = await supabase.rpc('rename_group', { p_group_id: groupId, p_name: name });
+  if (error) throw error;
+}
+
+// -----------------------------------------------------------------------
+// set_group_emoji(p_group_id, p_emoji)
+// Pass null to clear the emoji.
+// -----------------------------------------------------------------------
+export async function setGroupEmoji(groupId: string, emoji: string | null): Promise<void> {
+  const { error } = await supabase.rpc('set_group_emoji', { p_group_id: groupId, p_emoji: emoji });
   if (error) throw error;
 }
 

@@ -13,6 +13,7 @@ import {
   Share,
   ScrollView,
 } from 'react-native';
+import { EmojiKeyboard } from 'rn-emoji-keyboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
@@ -22,6 +23,7 @@ import {
   getMyChildren,
   createGroup,
   renameGroup,
+  setGroupEmoji,
   regenerateInviteToken,
   removeGuardianFromGroup,
   removeChildFromGroup,
@@ -585,6 +587,23 @@ function GroupCard({
   const [showRename, setShowRename]             = useState(false);
   const [showMembers, setShowMembers]           = useState(false);
   const [showTransferOwnership, setShowTransferOwnership] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker]   = useState(false);
+  const [localEmoji, setLocalEmoji]             = useState<string | null>(group.emoji);
+
+  useEffect(() => { setLocalEmoji(group.emoji); }, [group.emoji]);
+
+  async function handleEmojiSelect(emoji: string | null) {
+    const prev = localEmoji;
+    setLocalEmoji(emoji);
+    setShowEmojiPicker(false);
+    try {
+      await setGroupEmoji(group.id, emoji);
+      onRefresh();
+    } catch (e: any) {
+      setLocalEmoji(prev);
+      Alert.alert(t('errors.generic'), e.message);
+    }
+  }
 
   // Sole admin with no children in guardian_child_groups → show Delete only
   const isOnlyMember = group.is_admin && group.member_count <= 1;
@@ -711,11 +730,20 @@ function GroupCard({
       {/* Title row */}
       <View className="flex-row justify-between items-center">
         <Text className="text-lg font-semibold text-gray-900 flex-1 mr-2">{group.name}</Text>
-        {group.is_admin && (
-          <View className="bg-green-100 rounded px-2 py-0.5">
-            <Text className="text-green-700 text-xs">{t('groups.admin_badge')}</Text>
-          </View>
-        )}
+        <View className="flex-row items-center gap-2">
+          {group.is_admin && (
+            <View className="bg-green-100 rounded px-2 py-0.5">
+              <Text className="text-green-700 text-xs">{t('groups.admin_badge')}</Text>
+            </View>
+          )}
+          {group.is_admin ? (
+            <TouchableOpacity onPress={() => setShowEmojiPicker(true)}>
+              <Text className="text-2xl">{localEmoji ?? '\uFF0B'}</Text>
+            </TouchableOpacity>
+          ) : localEmoji ? (
+            <Text className="text-2xl">{localEmoji}</Text>
+          ) : null}
+        </View>
       </View>
 
       <Text className="text-sm text-gray-500 mt-1">{childLabel}</Text>
@@ -824,6 +852,28 @@ function GroupCard({
           onRefresh();
         }}
       />
+
+      {/* Emoji picker modal */}
+      <Modal
+        visible={showEmojiPicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowEmojiPicker(false)}
+      >
+        <View className="flex-1 justify-end bg-black/40">
+          <View className="bg-white rounded-t-2xl" style={{ maxHeight: '65%' }}>
+            <TouchableOpacity
+              className="items-center py-3"
+              onPress={() => handleEmojiSelect(null)}
+            >
+              <Text className="text-red-500">{t('groups.remove_emoji')}</Text>
+            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <EmojiKeyboard onEmojiSelected={(item) => handleEmojiSelect(item.emoji)} />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

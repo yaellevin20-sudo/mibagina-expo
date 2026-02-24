@@ -95,7 +95,9 @@
     "stay_in_group": "האם את רוצה להישאר בקבוצה?",
     "stay_in_group_yes": "כן, אני נשארת",
     "stay_in_group_no": "לא, אצא",
-    "already_member": "את כבר חברה בקבוצה הזו"
+    "already_member": "את כבר חברה בקבוצה הזו",
+    "choose_emoji": "בחרי אמוג'י",
+    "remove_emoji": "הסר אמוג'י"
   },
   "auth": {
     "email": "אימייל",

@@ -95,7 +95,9 @@
     "stay_in_group": "Do you want to stay in the group?",
     "stay_in_group_yes": "Yes, I'll stay",
     "stay_in_group_no": "No, leave",
-    "already_member": "You're already a member of this group"
+    "already_member": "You're already a member of this group",
+    "choose_emoji": "Choose an emoji",
+    "remove_emoji": "Remove emoji"
   },
   "auth": {
     "email": "Email",
