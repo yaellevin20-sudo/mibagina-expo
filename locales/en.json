@@ -53,6 +53,9 @@
     "remove_child": "Remove child",
     "sees_checkins": "Sees your check-ins",
     "no_children": "No children yet. Add your first child!",
+    "empty_title": "No children here yet",
+    "empty_subtitle": "Add children to see who's at the playground and join groups",
+    "add_children_cta": "Add children",
     "first_name": "First name",
     "last_name": "Last name",
     "date_of_birth": "Date of birth",
@@ -97,7 +100,11 @@
     "stay_in_group_no": "No, leave",
     "already_member": "You're already a member of this group",
     "choose_emoji": "Choose an emoji",
-    "remove_emoji": "Remove emoji"
+    "remove_emoji": "Remove emoji",
+    "select_child_label": "Children",
+    "select_child_placeholder": "Select children",
+    "add_child_option": "Add a child",
+    "child_required": "Please select at least one child"
   },
   "auth": {
     "email": "Email",
@@ -177,6 +184,7 @@
     "done": "Done"
   },
   "common": {
+    "app_name": "Mi Bagina",
     "cancel": "Cancel",
     "save": "Save",
     "confirm": "Confirm",

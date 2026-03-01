@@ -53,6 +53,9 @@
     "remove_child": "הסר ילד",
     "sees_checkins": "רואה את הצ'ק אינים שלך",
     "no_children": "עדיין אין ילדים. הוסף את הילד הראשון שלך!",
+    "empty_title": "עוד אין פה ילדים",
+    "empty_subtitle": "הוסיפו ילדים כדי לראות מי בגינה ולהצטרף לקבוצות",
+    "add_children_cta": "הוספת ילדים",
     "first_name": "שם פרטי",
     "last_name": "שם משפחה",
     "date_of_birth": "תאריך לידה",
@@ -97,7 +100,11 @@
     "stay_in_group_no": "לא, אצא",
     "already_member": "את כבר חברה בקבוצה הזו",
     "choose_emoji": "בחרי אמוג'י",
-    "remove_emoji": "הסר אמוג'י"
+    "remove_emoji": "הסר אמוג'י",
+    "select_child_label": "ילדים",
+    "select_child_placeholder": "בחר ילדים",
+    "add_child_option": "הוסף ילד",
+    "child_required": "יש לבחור לפחות ילד אחד"
   },
   "auth": {
     "email": "אימייל",
@@ -177,6 +184,7 @@
     "done": "סיום"
   },
   "common": {
+    "app_name": "מי בגינה",
     "cancel": "ביטול",
     "save": "שמור",
     "confirm": "אישור",

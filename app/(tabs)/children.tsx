@@ -11,9 +11,11 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { getJoinToken } from '../../lib/auth';
 import {
@@ -297,14 +299,19 @@ export default function ChildrenScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="flex-row justify-between items-center px-4 py-4 bg-white border-b border-gray-200">
-        <Text className="text-xl font-bold text-gray-900">{t('nav.children')}</Text>
-        <TouchableOpacity onPress={() => setShowAddModal(true)}>
-          <Text className="text-green-600 font-semibold text-base">{t('children.add_child')}</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5' }}>
+      {/* App bar */}
+      <View className="bg-white px-6 py-3 flex-row justify-between items-center">
+        <Text className="text-2xl font-semibold text-black">{t('common.app_name')} 🌳</Text>
+        <TouchableOpacity>
+          <Ionicons name="menu" size={24} color="black" />
         </TouchableOpacity>
       </View>
+
+      {/* Screen title */}
+      <Text className="text-3xl font-semibold text-black text-right px-6 pt-4 pb-2">
+        {t('onboarding.children_title')}
+      </Text>
 
       {pendingJoinToken && (
         <TouchableOpacity
@@ -331,13 +338,23 @@ export default function ChildrenScreen() {
           )}
           contentContainerStyle={{ paddingVertical: 12 }}
           ListEmptyComponent={
-            <View className="items-center justify-center mt-16 px-6">
-              <Text className="text-gray-500 text-base text-center">{t('children.no_children')}</Text>
+            <View className="flex-1 items-center justify-center pt-16 pb-8 px-6">
+              <Image
+                source={require('../../assets/kite.png')}
+                style={{ width: 202, height: 202, transform: [{ rotate: '-20deg' }] }}
+                resizeMode="contain"
+              />
+              <Text className="text-xl font-semibold text-black text-center mt-8">
+                {t('children.empty_title')}
+              </Text>
+              <Text className="text-base text-black text-center mt-3 w-56">
+                {t('children.empty_subtitle')}
+              </Text>
               <TouchableOpacity
-                className="mt-6 bg-green-600 rounded-lg px-8 py-3"
+                className="mt-10 bg-green-600 rounded-lg px-10 py-3 items-center"
                 onPress={() => setShowAddModal(true)}
               >
-                <Text className="text-white font-semibold">{t('children.add_child')}</Text>
+                <Text className="text-white font-semibold text-base">{t('children.add_children_cta')}</Text>
               </TouchableOpacity>
             </View>
           }

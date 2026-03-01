@@ -12,6 +12,8 @@ import {
   Platform,
   Share,
   ScrollView,
+  Keyboard,
+  Pressable,
 } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +23,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import {
   getMyGroups,
   getMyChildren,
+  addChild,
   createGroup,
   renameGroup,
   setGroupEmoji,
@@ -124,7 +127,88 @@ function TextInputModal({
 }
 
 // ---------------------------------------------------------------------------
-// Create Group Modal — name entry + child selection
+// Inline Add Child Form (mirrors join/[token].tsx InlineAddChildForm)
+// ---------------------------------------------------------------------------
+function InlineAddChildForm({ onAdded }: { onAdded: (child: ChildRow) => void }) {
+  const { t } = useTranslation();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName]   = useState('');
+  const [dob, setDob]             = useState('');
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState<string | null>(null);
+
+  async function handleSubmit() {
+    const f = firstName.trim();
+    const l = lastName.trim();
+    const d = dob.trim();
+    if (!f || !l || !d) { setError(t('errors.generic')); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { setError(t('children.date_of_birth_hint')); return; }
+    if (new Date(d) > new Date()) { setError(t('errors.generic')); return; }
+    setError(null);
+    setLoading(true);
+    try {
+      const childId = await addChild(f, l, d);
+      const newChild: ChildRow = {
+        id: childId,
+        first_name: f,
+        last_name: l,
+        age_years: new Date().getFullYear() - parseInt(d.slice(0, 4)),
+        created_at: new Date().toISOString(),
+        co_guardians: [],
+        groups: [],
+      };
+      onAdded(newChild);
+    } catch (e: any) {
+      setError(e.message ?? t('errors.generic'));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <View className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-200">
+      {error && <Text className="text-red-500 text-sm mb-3">{error}</Text>}
+      <Text className="text-sm font-medium text-gray-700 mb-1">{t('children.first_name')}</Text>
+      <TextInput
+        className="border border-gray-300 rounded-lg px-3 py-2 mb-3 text-base bg-white"
+        value={firstName}
+        onChangeText={setFirstName}
+        autoFocus
+        editable={!loading}
+      />
+      <Text className="text-sm font-medium text-gray-700 mb-1">{t('children.last_name')}</Text>
+      <TextInput
+        className="border border-gray-300 rounded-lg px-3 py-2 mb-3 text-base bg-white"
+        value={lastName}
+        onChangeText={setLastName}
+        editable={!loading}
+      />
+      <Text className="text-sm font-medium text-gray-700 mb-1">{t('children.date_of_birth')}</Text>
+      <TextInput
+        className="border border-gray-300 rounded-lg px-3 py-2 mb-4 text-base bg-white"
+        value={dob}
+        onChangeText={setDob}
+        placeholder={t('children.date_of_birth_hint')}
+        keyboardType="numeric"
+        editable={!loading}
+      />
+      <TouchableOpacity
+        className="bg-green-600 rounded-lg py-3 items-center"
+        onPress={handleSubmit}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text className="text-white font-semibold text-base">{t('children.add_child')}</Text>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Create Group Modal — single-step form with required child selection
 // ---------------------------------------------------------------------------
 function CreateGroupModal({
   visible,
@@ -136,86 +220,93 @@ function CreateGroupModal({
   onCreated: () => void;
 }) {
   const { t } = useTranslation();
-  type Step = 'name' | 'children';
-  const [step, setStep]           = useState<Step>('name');
-  const [groupName, setGroupName] = useState('');
-  const [groupId, setGroupId]     = useState<string | null>(null);
-  const [children, setChildren]   = useState<ChildRow[]>([]);
-  const [selected, setSelected]   = useState<Set<string>>(new Set());
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState<string | null>(null);
+  const [groupName, setGroupName]           = useState('');
+  const [children, setChildren]             = useState<ChildRow[]>([]);
+  const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set());
+  const [showPicker, setShowPicker]         = useState(false);
+  const [showAddChild, setShowAddChild]     = useState(false);
+  const [pendingGroupId, setPendingGroupId] = useState<string | null>(null);
+  const [loading, setLoading]               = useState(false);
+  const [error, setError]                   = useState<string | null>(null);
+  const submittingRef = useRef(false);
 
   useEffect(() => {
-    if (!visible) {
-      // Reset on close
-      setStep('name');
+    if (visible) {
       setGroupName('');
-      setGroupId(null);
-      setSelected(new Set());
+      setSelectedChildIds(new Set());
+      setPendingGroupId(null);
       setError(null);
+      setShowPicker(false);
+      setShowAddChild(false);
+      getMyChildren().then(setChildren).catch(console.error);
     }
   }, [visible]);
 
-  async function handleCreateName() {
-    const trimmed = groupName.trim();
-    if (!trimmed) { setError(t('errors.generic')); return; }
-    setError(null);
-    setLoading(true);
-    try {
-      const newGroupId = await createGroup(trimmed);
-      setGroupId(newGroupId);
-      const myChildren = await getMyChildren();
-      setChildren(myChildren);
-      setStep('children');
-    } catch (e: any) {
-      setError(e.message ?? t('errors.generic'));
-    } finally {
-      setLoading(false);
-    }
-  }
-
   function toggleChild(id: string) {
-    setSelected((prev) => {
+    setSelectedChildIds((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
   }
 
-  async function handleAddChildren() {
-    if (!groupId) return;
+  function handleChildAdded(newChild: ChildRow) {
+    setChildren((prev) => [...prev, newChild]);
+    setSelectedChildIds((prev) => new Set([...prev, newChild.id]));
+    setShowAddChild(false);
+  }
+
+  const canSubmit = groupName.trim().length > 0 && selectedChildIds.size > 0 && !loading;
+
+  async function handleCreate() {
+    if (submittingRef.current) return;
+    const trimmed = groupName.trim();
+    if (!trimmed || selectedChildIds.size === 0) return;
+    submittingRef.current = true;
+    setError(null);
     setLoading(true);
     try {
-      if (selected.size > 0) {
-        await addChildrenToGroup(groupId, [...selected]);
-      }
+      const gid = pendingGroupId ?? await createGroup(trimmed);
+      if (!pendingGroupId) setPendingGroupId(gid);
+      await addChildrenToGroup(gid, [...selectedChildIds]);
       onCreated();
     } catch (e: any) {
       setError(e.message ?? t('errors.generic'));
     } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   }
+
+  const selectedLabel =
+    selectedChildIds.size === 0
+      ? t('groups.select_child_placeholder')
+      : children
+          .filter((c) => selectedChildIds.has(c.id))
+          .map((c) => c.first_name)
+          .join(', ');
 
   if (!visible) return null;
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-      <SafeAreaView className="flex-1 bg-white">
-        <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View className="flex-row justify-between items-center px-4 py-4 border-b border-gray-200">
-            <TouchableOpacity onPress={step === 'name' ? onClose : () => setStep('name')} disabled={loading}>
-              <Text className="text-gray-500 text-base">
-                {step === 'name' ? t('common.cancel') : t('common.back')}
-              </Text>
-            </TouchableOpacity>
-            <Text className="text-lg font-semibold">{t('groups.create_group_title')}</Text>
-            <View style={{ width: 56 }} />
-          </View>
+    <>
+      <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+        <SafeAreaView className="flex-1 bg-white">
+          <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            {/* Header */}
+            <View className="flex-row justify-between items-center px-4 py-4 border-b border-gray-200">
+              <TouchableOpacity onPress={onClose} disabled={loading}>
+                <Text className="text-gray-500 text-base">{t('common.cancel')}</Text>
+              </TouchableOpacity>
+              <Text className="text-lg font-semibold">{t('groups.create_group_title')}</Text>
+              <View style={{ width: 56 }} />
+            </View>
 
-          {step === 'name' ? (
-            <View className="px-4 pt-6">
+            {/* Form */}
+            <ScrollView className="flex-1 px-4 pt-6">
               {error && <Text className="text-red-500 text-sm mb-4">{error}</Text>}
+
+              <Text className="text-sm font-medium text-gray-700 mb-1">{t('groups.group_name')}</Text>
               <TextInput
                 className="border border-gray-300 rounded-lg px-4 py-3 mb-6 text-base"
                 value={groupName}
@@ -224,36 +315,80 @@ function CreateGroupModal({
                 autoFocus
                 editable={!loading}
                 returnKeyType="done"
-                onSubmitEditing={handleCreateName}
               />
+
+              <Text className="text-sm font-medium text-gray-700 mb-1">{t('groups.select_child_label')}</Text>
               <TouchableOpacity
-                className="bg-green-600 rounded-lg py-4 items-center"
-                onPress={handleCreateName}
+                className="border border-gray-300 rounded-lg px-4 py-3 mb-4 flex-row justify-between items-center"
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setShowPicker(true);
+                }}
                 disabled={loading}
+              >
+                <Text
+                  className="text-base flex-1"
+                  style={{ color: selectedChildIds.size === 0 ? '#9ca3af' : '#111827' }}
+                >
+                  {selectedLabel}
+                </Text>
+                <Text className="text-gray-400 text-sm ml-2">▼</Text>
+              </TouchableOpacity>
+
+              {showAddChild && <InlineAddChildForm onAdded={handleChildAdded} />}
+            </ScrollView>
+
+            {/* Footer */}
+            <View className="px-4 pb-6 pt-2">
+              <TouchableOpacity
+                className={`rounded-lg py-4 items-center ${canSubmit ? 'bg-green-600' : 'bg-gray-300'}`}
+                onPress={handleCreate}
+                disabled={!canSubmit}
               >
                 {loading ? (
                   <ActivityIndicator color="white" />
                 ) : (
-                  <Text className="text-white font-semibold text-base">{t('checkin.next')}</Text>
+                  <Text className="text-white font-semibold text-base">{t('groups.create_group_title')}</Text>
                 )}
               </TouchableOpacity>
             </View>
-          ) : (
-            /* Child selection step */
-            <>
-              <Text className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                {t('join.select_children')}
-              </Text>
-              {error && <Text className="text-red-500 text-sm px-4 mb-2">{error}</Text>}
-              <ScrollView className="flex-1 px-4">
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </Modal>
+
+      {/* Child picker bottom sheet — sibling modal, RN renders to root window */}
+      <Modal
+        visible={showPicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowPicker(false)}
+      >
+        <Pressable
+          style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}
+          onPress={() => setShowPicker(false)}
+        >
+          <Pressable>
+            <View className="bg-white rounded-t-2xl" style={{ maxHeight: '60%' }}>
+              {/* Handle bar */}
+              <View className="items-center pt-3 pb-2">
+                <View className="w-10 rounded-full bg-gray-300" style={{ height: 4 }} />
+              </View>
+
+              {/* Picker header */}
+              <View className="flex-row justify-between items-center px-4 pb-3 border-b border-gray-200">
+                <Text className="text-base font-semibold">{t('groups.select_child_label')}</Text>
+                <TouchableOpacity onPress={() => setShowPicker(false)}>
+                  <Text className="text-green-600 font-semibold">{t('onboarding.done')}</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView>
                 {children.map((child) => {
-                  const isSelected = selected.has(child.id);
+                  const isSelected = selectedChildIds.has(child.id);
                   return (
                     <TouchableOpacity
                       key={child.id}
-                      className={`flex-row items-center bg-white rounded-xl p-4 mb-3 border shadow-sm ${
-                        isSelected ? 'border-green-500' : 'border-gray-100'
-                      }`}
+                      className="flex-row items-center px-4 py-3 border-b border-gray-100"
                       onPress={() => toggleChild(child.id)}
                     >
                       <View
@@ -269,32 +404,24 @@ function CreateGroupModal({
                     </TouchableOpacity>
                   );
                 })}
-                {children.length === 0 && (
-                  <Text className="text-gray-400 text-sm text-center py-4">
-                    {t('checkin.no_children')}
-                  </Text>
-                )}
-              </ScrollView>
-              <View className="px-4 pb-6 pt-2">
+
+                {/* Add a child row */}
                 <TouchableOpacity
-                  className="bg-green-600 rounded-lg py-4 items-center"
-                  onPress={handleAddChildren}
-                  disabled={loading}
+                  className="flex-row items-center px-4 py-4"
+                  onPress={() => {
+                    setShowPicker(false);
+                    setShowAddChild(true);
+                  }}
                 >
-                  {loading ? (
-                    <ActivityIndicator color="white" />
-                  ) : (
-                    <Text className="text-white font-semibold text-base">
-                      {selected.size > 0 ? t('onboarding.done') : t('auth.skip')}
-                    </Text>
-                  )}
+                  <Text className="text-green-600 text-base mr-2">+</Text>
+                  <Text className="text-green-600 text-base">{t('groups.add_child_option')}</Text>
                 </TouchableOpacity>
-              </View>
-            </>
-          )}
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </Modal>
+              </ScrollView>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </>
   );
 }
 
@@ -953,7 +1080,7 @@ export default function GroupsScreen() {
         />
       )}
 
-      {/* Create group modal (2-step: name + child selection) */}
+      {/* Create group modal */}
       <CreateGroupModal
         visible={showCreate}
         onClose={() => setShowCreate(false)}
