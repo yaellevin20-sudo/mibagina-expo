@@ -272,6 +272,7 @@ export default function HomeScreen() {
 
   // ── Load groups + active checkin + children on mount ─────────────────────
   useEffect(() => {
+    if (!user) return;
     Promise.all([
       getMyGroups(),
       getMyActiveCheckin(),
@@ -290,7 +291,7 @@ export default function HomeScreen() {
     Notifications.getPermissionsAsync()
       .then(({ status }) => setNotifDenied(status === 'denied'))
       .catch(() => {});
-  }, []);
+  }, [user]);
 
   // ── Poll feed + active checkin (30s, AppState-aware) ─────────────────────
   const poll = useCallback(async () => {
