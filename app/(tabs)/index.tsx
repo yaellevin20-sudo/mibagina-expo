@@ -11,7 +11,7 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
 import { useAuth } from '../../contexts/AuthContext';
@@ -292,6 +292,24 @@ export default function HomeScreen() {
       .then(({ status }) => setNotifDenied(status === 'denied'))
       .catch(() => {});
   }, [user]);
+
+  // ── Re-fetch groups + active check-in on tab focus ───────────────────────
+  useFocusEffect(
+    useCallback(() => {
+      if (!user) return;
+      Promise.all([getMyGroups(), getMyActiveCheckin()])
+        .then(([groupsData, active]) => {
+          setGroups(groupsData);
+          setActiveCheckin(active);
+          setSelectedGroupId(prev => {
+            // Keep current selection if still valid; otherwise pick first available
+            if (prev && groupsData.some(g => g.id === prev)) return prev;
+            return groupsData.length > 0 ? groupsData[0].id : null;
+          });
+        })
+        .catch(console.error);
+    }, [user])
+  );
 
   // ── Poll feed + active checkin (30s, AppState-aware) ─────────────────────
   const poll = useCallback(async () => {

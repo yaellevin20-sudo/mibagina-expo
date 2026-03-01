@@ -16,7 +16,7 @@ import {
   Pressable,
 } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../../contexts/AuthContext';
@@ -220,6 +220,7 @@ function CreateGroupModal({
   onCreated: () => void;
 }) {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [groupName, setGroupName]           = useState('');
   const [children, setChildren]             = useState<ChildRow[]>([]);
   const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set());
@@ -368,7 +369,7 @@ function CreateGroupModal({
           onPress={() => setShowPicker(false)}
         >
           <Pressable>
-            <View className="bg-white rounded-t-2xl" style={{ maxHeight: '60%' }}>
+            <View className="bg-white rounded-t-2xl" style={{ maxHeight: '60%', paddingBottom: insets.bottom }}>
               {/* Handle bar */}
               <View className="items-center pt-3 pb-2">
                 <View className="w-10 rounded-full bg-gray-300" style={{ height: 4 }} />

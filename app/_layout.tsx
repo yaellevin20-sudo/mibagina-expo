@@ -64,13 +64,18 @@ function RootNavigator() {
       return;
     }
 
-    const inAuthGroup  = segments[0] === '(auth)';
-    const inJoinRoute  = segments[0] === 'join'; // join/[token].tsx handles its own auth redirect
-    const inResetRoute = segments[0] === 'reset-password';
+    const inAuthGroup    = segments[0] === '(auth)';
+    const inJoinRoute    = segments[0] === 'join'; // join/[token].tsx handles its own auth redirect
+    const inResetRoute   = segments[0] === 'reset-password';
+    const inAuthCallback = segments[0] === 'auth'; // covers auth/callback
 
     if (!session && !inAuthGroup && !inJoinRoute && !inResetRoute) {
       // Not authenticated — send to landing screen.
       router.replace('/(auth)/landing');
+    }
+    if (session && inAuthCallback) {
+      // OAuth callback complete — navigate away from spinner.
+      router.replace('/(tabs)');
     }
     // Auth screens handle their own post-login routing (guardians row check,
     // join token resumption). Do not redirect here to avoid races.
