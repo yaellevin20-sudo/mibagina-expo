@@ -738,7 +738,7 @@ function GroupCard({
   const isAdminWithNoChildren = group.is_admin && group.my_children.length === 0 && group.member_count > 1;
 
   function handleShareInvite() {
-    Share.share({ message: `mibagina://join/${group.invite_token}` });
+    Share.share({ message: `https://mibagina.co.il/join/${group.invite_token}` });
   }
 
   function handleRegenerateInvite() {

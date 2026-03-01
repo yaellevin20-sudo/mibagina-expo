@@ -16,7 +16,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mibagina.app",
-      "infoPlist": { "UIBackgroundModes": ["remote-notification"] }
+      "infoPlist": { "UIBackgroundModes": ["remote-notification"] },
+      "associatedDomains": ["applinks:mibagina.co.il"]
     },
     "android": {
       "adaptiveIcon": {
@@ -28,27 +29,20 @@
       "intentFilters": [
         {
           "action": "VIEW",
-          "data": [
-            {
-              "scheme": "mibagina"
-            }
-          ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "data": [{ "scheme": "mibagina" }],
+          "category": ["BROWSABLE", "DEFAULT"]
         },
         {
           "action": "VIEW",
+          "autoVerify": true,
           "data": [
             {
-              "scheme": "mibagina"
+              "scheme": "https",
+              "host": "mibagina.co.il",
+              "pathPrefix": "/join"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
       "package": "com.mibagina.app"
@@ -64,7 +58,9 @@
       ["expo-notifications", { "icon": "./assets/icon.png", "color": "#16a34a", "defaultChannel": "still-there" }]
     ],
     "extra": {
-      "router": {},
+      "router": {
+        "origin": "https://mibagina.co.il"
+      },
       "eas": {
         "projectId": "cd1ed03c-0100-4477-8ba9-ffc8f89a55b9"
       }

@@ -72,9 +72,14 @@ Add to this table as new strings are introduced.
 
 ## Deep Linking
 
-- Scheme: `mibagina` (canonical). Format: `mibagina://join/[token]`.
-- Apply in: `app.config.js`, invite generation, `join/[token].tsx`, all docs.
+- Primary share format: `https://mibagina.co.il/join/[token]` (Universal Links / App Links — opens app directly on iOS and Android; falls back to web landing page with store links).
+- Internal fallback scheme: `mibagina://join/[token]` — remains valid for backward-compat and the "Open in app" button on the landing page.
+- Apply HTTPS format in: `app.json` (`associatedDomains`, Android intent filters, `extra.router.origin`), invite sharing in `groups.tsx`, `join/[token].tsx` handler, all docs.
 - If unauthenticated on join link: store token, redirect to auth, resume after.
+- Web files live in `web/` (deployed as standalone Vercel project at `mibagina.co.il`): `vercel.json`, `.well-known/apple-app-site-association`, `.well-known/assetlinks.json`, `join.html`, `index.html`.
+- `apple-app-site-association` uses modern `"components"` format (not legacy `"paths"`). Replace `TEAMID` placeholder before deploying.
+- `assetlinks.json`: replace `YOUR_SHA256_FINGERPRINT` with Play Console → App integrity → **App signing key** certificate fingerprint (not upload key).
+- Native rebuild required after `app.json` changes (`eas build --platform all`) — entitlements and manifest changes are not OTA-updatable.
 
 ---
 

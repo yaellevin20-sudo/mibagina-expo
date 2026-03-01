@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Smart App Banner: replace __APPSTORE_ID__ with numeric App Store ID -->
+  <meta name="apple-itunes-app" content="app-id=__APPSTORE_ID__, app-argument=APP_ARGUMENT_PLACEHOLDER" />
+  <title>מי בגינה — הצטרף לקבוצה</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+      background: #f9fafb;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 40px 32px; max-width: 400px; width: 100%; text-align: center;
+    }
+    .logo { font-size: 48px; margin-bottom: 16px; }
+    h1 { font-size: 22px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    p  { font-size: 15px; color: #6b7280; margin-bottom: 28px; line-height: 1.5; }
+    .btn {
+      display: block; width: 100%; padding: 14px 0;
+      border-radius: 12px; font-size: 16px; font-weight: 600;
+      text-decoration: none; margin-bottom: 12px;
+    }
+    .btn-primary { background: #16a34a; color: #fff; }
+    .btn-secondary { background: #111827; color: #fff; }
+    .btn-outline { background: #fff; color: #374151; border: 1.5px solid #d1d5db; }
+    small { color: #9ca3af; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🌳</div>
+    <h1>הוזמנת להצטרף לקבוצה</h1>
+    <p>פתח את האפליקציה מי בגינה כדי להצטרף.<br>אין לך אותה עדיין? הורד עכשיו.</p>
+
+    <a id="open-link" class="btn btn-primary" href="#">פתח באפליקציה</a>
+    <a id="ios-store" class="btn btn-secondary"
+       href="https://apps.apple.com/app/id__APPSTORE_ID__">
+      הורד מ-App Store
+    </a>
+    <a class="btn btn-outline"
+       href="https://play.google.com/store/apps/details?id=com.mibagina.app">
+      הורד מ-Google Play
+    </a>
+    <br/><small>הקישור בתוקף — פתח את האפליקציה להצטרפות</small>
+  </div>
+
+  <script>
+    // Token is in pathname: /join/TOKEN
+    var token = window.location.pathname.split('/').filter(Boolean).pop() || '';
+    var deepLink = 'mibagina://join/' + encodeURIComponent(token);
+
+    // Update Smart App Banner to pass the correct deep link argument
+    var banner = document.querySelector('meta[name="apple-itunes-app"]');
+    if (banner && token) {
+      banner.setAttribute('content',
+        'app-id=__APPSTORE_ID__, app-argument=' + deepLink);
+    }
+
+    // "Open in app" button: uses custom scheme — Safari shows dialog if app installed,
+    // does nothing harmful if not. Better than a broken auto-redirect.
+    var openLink = document.getElementById('open-link');
+    if (openLink && token) openLink.setAttribute('href', deepLink);
+
+    // Hide iOS store link on non-iOS
+    var ua = navigator.userAgent;
+    if (!/iPhone|iPad|iPod/i.test(ua)) {
+      var iosStore = document.getElementById('ios-store');
+      if (iosStore) iosStore.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
