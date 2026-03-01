@@ -12,6 +12,7 @@ import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import i18n from '../lib/i18n';
 import { StillThereModal } from '../components/StillThereModal';
+import { SplashAnimation } from '../components/SplashAnimation';
 import { respondStillThere, leaveCheckin } from '../lib/db/rpc';
 import type { StillTherePayload, GroupCheckinPayload, GroupDeletedPayload } from '../lib/notifications';
 
@@ -37,6 +38,7 @@ function RootNavigator() {
   const segments = useSegments();
   const router = useRouter();
 
+  const [splashDone, setSplashDone] = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState<StillTherePayload | null>(null);
   const coldStartHandled = useRef(false);
 
@@ -194,6 +196,7 @@ function RootNavigator() {
     <>
       <Stack screenOptions={{ headerShown: false }} />
       <StillThereModal payload={pendingPrompt} onDismiss={() => setPendingPrompt(null)} />
+      {!splashDone && <SplashAnimation onDone={() => setSplashDone(true)} />}
     </>
   );
 }
