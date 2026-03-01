@@ -64,16 +64,19 @@ export default function CheckinScreen() {
   const loadData = useCallback(async () => {
     setDataLoading(true);
     try {
-      const [kids, parks] = await Promise.all([getMyChildren(), getMyPlaygrounds()]);
-      setChildren(kids);
-      setPlaygrounds(parks);
+      const [kidsResult, parksResult] = await Promise.allSettled([
+        getMyChildren(),
+        getMyPlaygrounds(),
+      ]);
+      if (kidsResult.status === 'fulfilled') setChildren(kidsResult.value);
+      else console.error('[checkin] children load error', kidsResult.reason);
+      if (parksResult.status === 'fulfilled') setPlaygrounds(parksResult.value);
+      else console.error('[checkin] playgrounds load error', parksResult.reason);
       // Pre-select children from URL params
       if (childIdsParam) {
         const ids = childIdsParam.split(',').filter(Boolean);
         setSelectedChildren(new Set(ids));
       }
-    } catch (e) {
-      console.error('[checkin] load error', e);
     } finally {
       setDataLoading(false);
     }
