@@ -33,6 +33,9 @@ yarn-error.*
 .claude/
 .agents/
 skills-lock.json
+
+# Design review mockups
+*.html
 *.pem
 
 # local env files
