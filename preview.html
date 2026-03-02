@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מי בגינה — Design Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: #b5b5b5;
+      background-image:
+        radial-gradient(ellipse at 25% 10%, #cfe8d8 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 85%, #c5dece 0%, transparent 55%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 48px;
+      gap: 22px;
+    }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .tab {
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 22px; padding: 9px 18px;
+      font-family: 'Rubik', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; color: #374151; transition: all 0.15s; white-space: nowrap;
+    }
+    .tab:hover { background: white; border-color: #3D7A50; color: #3D7A50; }
+    .tab.active { background: #3D7A50; border-color: #3D7A50; color: white; }
+
+    /* ── Phone shell ── */
+    .phone-shell {
+      width: 375px; height: 812px;
+      background: #0f0f0f;
+      border-radius: 54px; padding: 12px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.12),
+        0 40px 100px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      position: relative; flex-shrink: 0;
+    }
+    .phone-shell::before {
+      content: ''; position: absolute;
+      top: 12px; left: 50%; transform: translateX(-50%);
+      width: 128px; height: 34px;
+      background: #0f0f0f; border-radius: 0 0 24px 24px; z-index: 20;
+    }
+    .phone-screen {
+      width: 100%; height: 100%;
+      border-radius: 44px; overflow: hidden;
+      background: white; position: relative;
+    }
+
+    /* ── Status bar — always LTR ── */
+    .status-bar {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 44px; display: flex; align-items: flex-end;
+      justify-content: space-between; padding: 0 26px 9px;
+      z-index: 100; direction: ltr;
+    }
+    .s-time { font-size: 15px; font-weight: 600; color: #1a1a1a; letter-spacing: -0.3px; }
+    .s-icons { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Screen container ── */
+    .screen {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      overflow-y: auto; overflow-x: hidden; scrollbar-width: none; display: none;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+    .screen.active { display: block; }
+    .bg { min-height: 812px; background: linear-gradient(180deg, #ffffff 0%, #F1FDF5 100%); }
+
+    /* ── App header (RTL: title=RIGHT first, hamburger=LEFT last) ── */
+    .app-header {
+      position: sticky; top: 44px; z-index: 10;
+      background: white; height: 56px;
+      display: flex; align-items: center; padding: 0 20px;
+    }
+    .hdr-title { font-size: 22px; font-weight: 700; color: #1a1a1a; flex-shrink: 0; }
+    .hdr-gap   { flex: 1; }
+    .hdr-menu  { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hdr-menu span { display: block; width: 22px; height: 2px; background: #1a1a1a; border-radius: 2px; }
+
+    /* ── Greeting ── */
+    .greeting { padding: 26px 20px 14px; }
+    .greeting-name { font-size: 30px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+    .greeting-sub  { font-size: 17px; font-weight: 400; color: #4a4a4a; }
+
+    /* ── Empty state ── */
+    .empty { display: flex; flex-direction: column; align-items: center; padding: 8px 20px 48px; text-align: center; }
+    .empty-img { width: 196px; height: 196px; object-fit: contain; margin-bottom: 18px; }
+    .empty-title { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+    .empty-sub   { font-size: 18px; color: #444; margin-bottom: 28px; line-height: 1.4; }
+
+    /* ── CTA button (green, matches landing.tsx) ── */
+    .btn-cta {
+      background: #3D7A50; color: white; border: none;
+      border-radius: 12px; padding: 15px 24px;
+      font-family: 'Rubik', sans-serif; font-size: 16px; font-weight: 600;
+      cursor: pointer; width: calc(100% - 40px); display: block;
+      margin: 0 20px; text-align: center; transition: background 0.15s;
+    }
+    .btn-cta:hover { background: #2D6040; }
+
+    /* ── Active session card ── */
+    .active-card {
+      margin: 10px 16px 10px;
+      border-radius: 14px;
+      border: 1px solid #e5ddd5;
+      border-top: 3px solid #E07B30;   /* ← orange top accent */
+      background: white;
+      overflow: hidden;
+    }
+    .active-card-inner { padding: 16px; }
+    .active-desc {
+      font-size: 17px; font-weight: 600;   /* bold description */
+      color: #1a1a1a; line-height: 1.45; margin-bottom: 10px;
+    }
+    /* RTL flex: text on RIGHT (first), bullet on LEFT (last) */
+    .active-meta {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 14px; direction: rtl;
+    }
+    .orange-time { font-size: 14px; font-weight: 400; color: #767d8b; }
+    .orange-dot  { font-size: 18px; line-height: 1; color: #E07B30; flex-shrink: 0; }
+
+    .active-actions { display: flex; gap: 10px; }
+
+    /* "שינוי גינה" — solid brand green */
+    .btn-switch {
+      flex: 1; background: #3D7A50; color: white;
+      border: none; border-radius: 10px; padding: 12px 10px;
+      font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; text-align: center; transition: background 0.15s;
+    }
+    .btn-switch:hover { background: #2D6040; }
+
+    /* "סיום ביקור" — white outline */
+    .btn-end {
+      flex: 1; background: white; color: #3D7A50;
+      border: 1.5px solid #3D7A50; border-radius: 10px; padding: 12px 10px;
+      font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; text-align: center; transition: all 0.15s;
+    }
+    .btn-end:hover { background: #E4F2EA; }
+
+    /* ── Group cards ── */
+    .groups { padding: 2px 16px 16px; }
+    .gc {
+      background: white; border: 1px solid #d9d9d9;
+      border-radius: 14px; margin-bottom: 10px; overflow: hidden;
+    }
+    /* RTL: emoji=RIGHT(first), name=middle, chevron=LEFT(last) */
+    .gc-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; cursor: pointer; min-height: 68px; user-select: none;
+    }
+    .gc-emoji {
+      width: 36px; height: 36px; background: #fef7ff;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .gc-name { flex: 1; font-size: 17px; font-weight: 500; color: #1a1a1a; }
+    .chevron {
+      width: 30px; height: 30px; background: #f3f4f6;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: transform 0.25s, background 0.15s;
+    }
+    .gc:hover .chevron { background: #e9eaec; }
+    .gc.expanded .chevron { transform: rotate(180deg); }
+
+    .gc-body { display: none; padding: 4px 16px 14px; border-top: 1px solid #f3f4f6; }
+    .gc.expanded .gc-body { display: block; }
+
+    /* ── Family row (collapsible) ── */
+    .family { padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+    .family:last-child { border-bottom: none; }
+
+    /* Family header row: RTL flex — name RIGHT (first), chevron LEFT (last) */
+    .fam-header {
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; user-select: none; margin-bottom: 3px;
+    }
+    .fam-name { font-size: 14px; font-weight: 500; color: #1a1a1a; flex: 1; }
+    .fam-name span { font-weight: 400; color: #555; }
+    .fam-chevron {
+      width: 22px; height: 22px; background: #f3f4f6;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: transform 0.2s;
+    }
+    .family.fam-open .fam-chevron { transform: rotate(180deg); }
+
+    .fam-meta { font-size: 12px; color: #767d8b; margin-bottom: 2px; }
+
+    .fam-children { display: none; padding-right: 4px; margin-top: 6px; }
+    .family.fam-open .fam-children { display: block; }
+
+    /* Inside family: names bold, ages regular */
+    .fam-child { font-size: 13px; color: #374151; line-height: 1.8; }
+    .fam-child strong { font-weight: 600; }
+    .fam-child span   { font-weight: 400; }
+
+    /* Simple family row (non-collapsible) */
+    .family-simple { padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+    .family-simple:last-child { border-bottom: none; }
+    .fsim-name { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+    .fsim-name span { font-weight: 400; color: #555; }
+    .fsim-meta { font-size: 12px; color: #767d8b; margin-top: 2px; }
+
+    /* ── Check-in form ── */
+    /* RTL: back btn = first-child → physical RIGHT (leading) */
+    .ci-nav {
+      display: flex; align-items: center;
+      padding: 52px 20px 0;
+    }
+    /* Back btn: RTL natural — arrow RIGHT (first child), text LEFT (second child) */
+    .back-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 600;
+      color: #1a1a1a;
+      display: flex; align-items: center; gap: 5px;
+      padding: 8px 0;
+    }
+    .ci-spacer { flex: 1; }
+    .ci-title { font-size: 28px; font-weight: 600; color: #1a1a1a; padding: 12px 20px 22px; }
+
+    /* ── Form sections ── */
+    .form-sec { padding: 0 20px 20px; }
+    .sec-label { font-size: 17px; font-weight: 400; color: #1a1a1a; margin-bottom: 3px; }
+    .sec-hint  { font-size: 12px; color: #767d8b; margin-bottom: 10px; }
+
+    /* ── Chips — RTL flow (right → left) ── */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* Unselected: green outline, white fill, green text */
+    .chip {
+      border: 1.5px solid #008234;
+      border-radius: 8px; padding: 7px 15px;
+      font-family: 'Rubik', sans-serif; font-size: 13px; font-weight: 500;
+      color: #008234; background: white;
+      cursor: pointer; user-select: none;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+    }
+    .chip:hover { background: #E4F2EA; }
+
+    /* Selected: solid green fill, white text */
+    .chip.on {
+      background: #3D7A50;
+      border-color: #3D7A50;
+      color: white;
+    }
+    .chip.on:hover { background: #2D6040; border-color: #2D6040; }
+
+    /* ── Dropdown ── */
+    .dd {
+      border: 1.5px solid #afafaf; border-radius: 10px;
+      background: white; overflow: hidden; transition: border-color 0.15s;
+    }
+    .dd.filled, .dd.open { border-color: #1a1a1a; }
+
+    /* RTL: text=RIGHT(first), arrow=LEFT(last) */
+    .dd-trigger {
+      display: flex; align-items: center;
+      padding: 11px 14px; min-height: 44px; cursor: pointer; gap: 10px;
+    }
+    .dd-label {
+      flex: 1; font-size: 15px; color: #767d8b; text-align: right;
+    }
+    .dd-label.has-val { color: #1a1a1a; }
+    .dd-arrow { flex-shrink: 0; transition: transform 0.2s; color: #767d8b; }
+    .dd.open .dd-arrow { transform: rotate(180deg); }
+
+    .dd-list { display: none; border-top: 1px solid #ebebeb; }
+    .dd.open .dd-list { display: block; }
+
+    .dd-item {
+      padding: 13px 16px; font-size: 15px; color: #1a1a1a;
+      cursor: pointer; border-bottom: 1px solid #f3f4f6;
+      transition: background 0.1s; text-align: right;
+    }
+    .dd-item:last-child { border-bottom: none; }
+    .dd-item:hover { background: #f5f5f5; }
+
+    /* "הוספת גינה חדשה" — RTL: text RIGHT (first), + badge LEFT (last) */
+    .dd-item.add-new {
+      display: flex; align-items: center; gap: 8px;
+      color: #3D7A50; font-weight: 500; font-size: 14px;
+    }
+    .plus-badge {
+      width: 22px; height: 22px; background: #E4F2EA;
+      border-radius: 5px; display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: #3D7A50; flex-shrink: 0;
+    }
+
+    /* Inline "add playground" input (shown when add-new clicked) */
+    .add-pg-form {
+      display: none;
+      padding: 12px 14px;
+      border-top: 1px solid #ebebeb;
+      gap: 8px;
+      direction: ltr; /* input in LTR */
+      align-items: center;
+    }
+    .add-pg-form.visible { display: flex; }
+    .add-pg-input {
+      flex: 1; border: 1.5px solid #d1d5db; border-radius: 8px;
+      padding: 8px 12px; font-family: 'Rubik', sans-serif; font-size: 14px;
+      outline: none; direction: rtl; /* text itself is RTL/Hebrew */
+      transition: border-color 0.15s;
+    }
+    .add-pg-input:focus { border-color: #3D7A50; }
+    .add-pg-input::placeholder { color: #b0b4bb; }
+    .add-pg-confirm {
+      background: #3D7A50; color: white; border: none;
+      border-radius: 8px; padding: 8px 14px;
+      font-family: 'Rubik', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .add-pg-confirm:hover { background: #2D6040; }
+
+    /* ── Save button ── */
+    .btn-save {
+      background: #3D7A50; color: white;   /* green when enabled */
+      border: none; border-radius: 10px; padding: 14px;
+      font-family: 'Rubik', sans-serif; font-size: 16px; font-weight: 500;
+      cursor: pointer; display: block;
+      width: calc(100% - 40px); margin: 12px 20px 32px;
+      text-align: center; transition: all 0.2s;
+    }
+    .btn-save:disabled {
+      background: #E9EAEC; color: #B0B4BB; cursor: not-allowed;
+    }
+    .btn-save:not(:disabled):hover { background: #2D6040; }
+
+    /* ── Footer ── */
+    .footer { font-size: 12px; color: #666; direction: ltr; letter-spacing: 0.04em; }
+  </style>
+</head>
+<body>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-s="home-empty">🏠 בית — ריק</button>
+    <button class="tab"        data-s="home-active">🏠 בית — פעיל</button>
+    <button class="tab"        data-s="checkin">הוספת ביקור</button>
+  </div>
+
+  <div class="phone-shell">
+    <div class="phone-screen">
+
+      <!-- Status bar (LTR always) -->
+      <div class="status-bar">
+        <span class="s-time">9:41</span>
+        <div class="s-icons">
+          <svg width="18" height="13" viewBox="0 0 18 13" fill="none">
+            <rect x="0"  y="7"  width="3" height="6"  rx="1" fill="#1a1a1a"/>
+            <rect x="5"  y="4"  width="3" height="9"  rx="1" fill="#1a1a1a"/>
+            <rect x="10" y="1"  width="3" height="12" rx="1" fill="#1a1a1a"/>
+            <rect x="15" y="0"  width="3" height="13" rx="1" fill="#1a1a1a" opacity="0.25"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <circle cx="8" cy="10.5" r="1.5" fill="#1a1a1a"/>
+            <path d="M4.9 7.8a4.4 4.4 0 0 1 6.2 0" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <path d="M2.2 5.1a8 8 0 0 1 11.6 0" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <svg width="26" height="13" viewBox="0 0 26 13" fill="none">
+            <rect x="0.5" y="0.5" width="21" height="12" rx="3.5" stroke="#1a1a1a" stroke-opacity="0.35"/>
+            <rect x="2" y="2" width="16" height="9" rx="2" fill="#1a1a1a"/>
+            <path d="M23 4.5v4c.9-.4 1.5-1.2 1.5-2s-.6-1.6-1.5-2z" fill="#1a1a1a" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ══════════════ HOME — EMPTY ══════════════ -->
+      <div class="screen active" id="s-home-empty">
+        <div class="bg">
+          <div style="height:44px"></div>
+          <!-- Header: RTL → title RIGHT, hamburger LEFT -->
+          <div class="app-header">
+            <div class="hdr-title">מי בגינה 🌳</div>
+            <div class="hdr-gap"></div>
+            <div class="hdr-menu"><span></span><span></span><span></span></div>
+          </div>
+          <div class="greeting">
+            <div class="greeting-name">שלום, יעל 👋</div>
+            <div class="greeting-sub">מי בגינה היום?</div>
+          </div>
+          <div class="empty">
+            <img
+              class="empty-img"
+              src="https://www.figma.com/api/mcp/asset/9a475410-f595-4bd1-909f-080e7f052e31"
+              alt="גינת ילדים"
+              onerror="this.style.display='none';document.getElementById('illo-fb').style.display='block'">
+            <!-- Fallback SVG -->
+            <svg id="illo-fb" style="display:none;width:196px;height:196px;margin-bottom:18px" viewBox="0 0 196 196" fill="none">
+              <ellipse cx="98" cy="177" rx="68" ry="9" fill="#D1F0DA" opacity="0.7"/>
+              <line x1="145" y1="86" x2="173" y2="158" stroke="#3D7A50" stroke-width="3.5" stroke-linecap="round"/>
+              <line x1="145" y1="86" x2="160" y2="86" stroke="#3D7A50" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="50" y="102" width="88" height="73" rx="5" fill="#E8F5E9" stroke="#3D7A50" stroke-width="2"/>
+              <polygon points="40,104 94,58 152,104" fill="#3D7A50"/>
+              <polygon points="40,104 94,65 152,104" fill="#4E9265"/>
+              <rect x="74" y="132" width="36" height="43" rx="5" fill="#3D7A50"/>
+              <rect x="56" y="113" width="22" height="18" rx="3" fill="white" stroke="#3D7A50" stroke-width="1.5"/>
+              <line x1="67" y1="113" x2="67" y2="131" stroke="#3D7A50" stroke-width="1"/>
+              <rect x="108" y="113" width="22" height="18" rx="3" fill="white" stroke="#3D7A50" stroke-width="1.5"/>
+              <line x1="119" y1="113" x2="119" y2="131" stroke="#3D7A50" stroke-width="1"/>
+              <line x1="26" y1="70" x2="46" y2="70" stroke="#3D7A50" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="30" y1="70" x2="30" y2="116" stroke="#3D7A50" stroke-width="2" stroke-linecap="round"/>
+              <line x1="42" y1="70" x2="42" y2="116" stroke="#3D7A50" stroke-width="2" stroke-linecap="round"/>
+              <rect x="24" y="116" width="22" height="6" rx="3" fill="#5BA870"/>
+            </svg>
+            <div class="empty-title">אין ילדים בגינה כרגע</div>
+            <div class="empty-sub">מישהו צריך להיות הראשון 😉</div>
+            <button class="btn-cta" onclick="switchScreen('checkin')">הוסיפו ביקור בגינה</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ HOME — ACTIVE ══════════════ -->
+      <div class="screen" id="s-home-active">
+        <div class="bg">
+          <div style="height:44px"></div>
+          <div class="app-header">
+            <div class="hdr-title">מי בגינה 🌳</div>
+            <div class="hdr-gap"></div>
+            <div class="hdr-menu"><span></span><span></span><span></span></div>
+          </div>
+          <div class="greeting">
+            <div class="greeting-name">שלום, יעל 👋</div>
+            <div class="greeting-sub">מי בגינה היום?</div>
+          </div>
+
+          <!-- Active session card — orange top accent -->
+          <div class="active-card">
+            <div class="active-card-inner">
+              <div class="active-desc">
+                גור, עוז, לביא, יונתן ונועה בגינת חנה רובינא
+              </div>
+              <div class="active-meta">
+                <span class="orange-time">עם אמא יעל · לפני 30 דקות</span>
+              </div>
+              <!-- RTL: "שינוי גינה" RIGHT (leading action), "סיום ביקור" LEFT -->
+              <div class="active-actions">
+                <button class="btn-switch">שינוי גינה</button>
+                <button class="btn-end">סיום ביקור</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group cards -->
+          <div class="groups">
+
+            <!-- Group 1: 🐦 גן כחל — starts expanded -->
+            <div class="gc expanded" id="gc1">
+              <div class="gc-header" onclick="toggleGC('gc1')">
+                <!-- RTL: emoji RIGHT (first), name middle, chevron LEFT (last) -->
+                <div class="gc-emoji">🐦</div>
+                <div class="gc-name">גן כחל · 3 ילדים בגינה</div>
+                <div class="chevron">
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="gc-body">
+
+                <!-- ── משפחת כרמלי — collapsible ── -->
+                <div class="family fam-open" id="fam1">
+                  <!-- RTL: name RIGHT (first), chevron LEFT (last) -->
+                  <div class="fam-header" onclick="toggleFam('fam1')">
+                    <div class="fam-name">משפחת כרמלי <span>(5 ילדים)</span></div>
+                    <div class="fam-chevron">
+                      <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                        <path d="M1 1L5 5.5L9 1" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="fam-meta">עם אמא יעל · לפני 45 דק׳</div>
+                  <!-- Children: names bold, ages regular -->
+                  <div class="fam-children">
+                    <div class="fam-child"><strong>גור</strong> <span>(בן 1)</span></div>
+                    <div class="fam-child"><strong>עוז</strong> <span>(בן 4)</span></div>
+                    <div class="fam-child"><strong>לביא</strong> <span>(בן 4)</span></div>
+                    <div class="fam-child"><strong>יונתן</strong> <span>(בן 7)</span></div>
+                    <div class="fam-child"><strong>נועה</strong> <span>(בת 12)</span></div>
+                  </div>
+                </div>
+
+                <!-- עילאי ספונדר — simple row -->
+                <div class="family-simple">
+                  <div class="fsim-name">עילאי ספונדר <span>(בן 4)</span></div>
+                  <div class="fsim-meta">עם מלווה · לפני שעה ו-20 דק׳</div>
+                </div>
+
+                <!-- איתי סנדלר — simple row -->
+                <div class="family-simple">
+                  <div class="fsim-name">איתי סנדלר <span>(בן 5)</span></div>
+                  <div class="fsim-meta">עם אבא שאול · לפני 7 דק׳</div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Group 2: 🐨 הפרלמנט של קוין — collapsed -->
+            <div class="gc" id="gc2">
+              <div class="gc-header" onclick="toggleGC('gc2')">
+                <div class="gc-emoji">🐨</div>
+                <div class="gc-name">הפרלמנט של קוין · ילד אחד בגינה</div>
+                <div class="chevron">
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="gc-body">
+                <div class="family-simple">
+                  <div class="fsim-name">יוסי לוי <span>(בן 6)</span></div>
+                  <div class="fsim-meta">עם אמא מיכל · לפני 12 דק׳</div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /groups -->
+        </div>
+      </div>
+
+      <!-- ══════════════ CHECK-IN FORM ══════════════ -->
+      <div class="screen" id="s-checkin">
+        <div class="bg">
+
+          <!-- Nav: RTL → back btn first = physical RIGHT (leading) -->
+          <div class="ci-nav">
+            <!-- direction:ltr on button: arrow first visually, then text -->
+            <!-- Arrow → faces right = RTL "back" direction -->
+            <button class="back-btn" onclick="switchScreen('home-empty')">
+              <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+                <path d="M17 7H1M17 7L11 1M17 7L11 13" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>חזרה</span>
+            </button>
+            <div class="ci-spacer"></div>
+          </div>
+
+          <div class="ci-title">הוספת ביקור בגינה</div>
+
+          <!-- Section 1: children (chips flow RTL) -->
+          <div class="form-sec">
+            <div class="sec-label">מי מגיע לגינה?</div>
+            <div class="sec-hint">בחרו לפחות ילד אחד</div>
+            <div class="chips" id="chips">
+              <div class="chip"    data-cid="gur">גור</div>
+              <div class="chip"    data-cid="oz">עוז</div>
+              <div class="chip"    data-cid="lavi">לביא</div>
+              <div class="chip"    data-cid="yonatan">יונתן</div>
+              <div class="chip"    data-cid="noa">נועה</div>
+            </div>
+          </div>
+
+          <!-- Section 2: playground dropdown -->
+          <div class="form-sec">
+            <div class="sec-label">לאיזה גינה הולכים?</div>
+            <!-- RTL: label RIGHT (first), arrow LEFT (last) -->
+            <div class="dd" id="dd-pg">
+              <div class="dd-trigger" onclick="toggleDD('dd-pg')">
+                <span class="dd-label" id="dd-pg-lbl">בחר גינה מהרשימה</span>
+                <svg class="dd-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="dd-list">
+                <div class="dd-item" onclick="pickPG('גינת חנה רובינא')">גינת חנה רובינא</div>
+                <div class="dd-item" onclick="pickPG('גינת הפרלמנט')">גינת הפרלמנט</div>
+                <!-- RTL row: text RIGHT (first), + badge LEFT (last) -->
+                <div class="dd-item add-new" id="btn-add-pg" onclick="showAddPG()">
+                  <span>הוספת גינה חדשה</span>
+                  <div class="plus-badge">+</div>
+                </div>
+                <!-- Inline add form (hidden by default) -->
+                <div class="add-pg-form" id="add-pg-form">
+                  <button class="add-pg-confirm" onclick="confirmAddPG()">הוסף</button>
+                  <input
+                    class="add-pg-input"
+                    id="add-pg-input"
+                    type="text"
+                    placeholder="שם הגינה"
+                    onkeydown="if(event.key==='Enter') confirmAddPG()">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: guardian dropdown -->
+          <div class="form-sec">
+            <div class="sec-label">מי הולך עם הילדים?</div>
+            <div class="dd" id="dd-guard">
+              <div class="dd-trigger" onclick="toggleDD('dd-guard')">
+                <span class="dd-label" id="dd-guard-lbl">בחר מלווה מהרשימה</span>
+                <svg class="dd-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="dd-list">
+                <div class="dd-item" onclick="pickGuard('עם אמא')">עם אמא</div>
+                <div class="dd-item" onclick="pickGuard('עם אבא')">עם אבא</div>
+                <div class="dd-item" onclick="pickGuard('עם מלווה אחר')">עם מלווה אחר</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save — green when enabled -->
+          <button class="btn-save" id="btn-save" disabled>שמירה</button>
+
+        </div>
+      </div>
+
+    </div><!-- /phone-screen -->
+  </div><!-- /phone-shell -->
+
+  <div class="footer">מי בגינה · Design Preview · 375px RTL</div>
+
+  <script>
+    // ── Screen switching ─────────────────────────────────────────────────────
+    function switchScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('s-' + id).classList.add('active');
+      document.getElementById('s-' + id).scrollTop = 0;
+      document.querySelectorAll('.tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.s === id));
+    }
+    document.querySelectorAll('.tab').forEach(t =>
+      t.addEventListener('click', () => switchScreen(t.dataset.s)));
+
+    // ── Group card accordion ─────────────────────────────────────────────────
+    function toggleGC(id) { document.getElementById(id).classList.toggle('expanded'); }
+
+    // ── Family row collapse ──────────────────────────────────────────────────
+    function toggleFam(id) { document.getElementById(id).classList.toggle('fam-open'); }
+
+    // ── Chips: all start unselected (green outline, no fill) ─────────────────
+    const selected = new Set();
+
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const id = chip.dataset.cid;
+        if (selected.has(id)) {
+          selected.delete(id);
+          chip.classList.remove('on');
+        } else {
+          selected.add(id);
+          chip.classList.add('on');
+        }
+        checkSave();
+      });
+    });
+
+    // ── Dropdowns ────────────────────────────────────────────────────────────
+    let pg = null, guard = null;
+
+    function toggleDD(id) {
+      const el = document.getElementById(id);
+      const wasOpen = el.classList.contains('open');
+      document.querySelectorAll('.dd').forEach(d => d.classList.remove('open'));
+      if (!wasOpen) el.classList.add('open');
+    }
+
+    // Close on outside click
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.dd') && !e.target.closest('.dd-trigger')) {
+        document.querySelectorAll('.dd').forEach(d => d.classList.remove('open'));
+      }
+    });
+
+    function pickPG(name) {
+      pg = name;
+      const lbl = document.getElementById('dd-pg-lbl');
+      lbl.textContent = name;
+      lbl.classList.add('has-val');
+      const dd = document.getElementById('dd-pg');
+      dd.classList.remove('open');
+      dd.classList.add('filled');
+      // Hide add form if open
+      document.getElementById('add-pg-form').classList.remove('visible');
+      checkSave();
+    }
+
+    function pickGuard(name) {
+      guard = name;
+      const lbl = document.getElementById('dd-guard-lbl');
+      lbl.textContent = name;
+      lbl.classList.add('has-val');
+      const dd = document.getElementById('dd-guard');
+      dd.classList.remove('open');
+      dd.classList.add('filled');
+      checkSave();
+    }
+
+    // ── Add new playground ───────────────────────────────────────────────────
+    function showAddPG() {
+      const form = document.getElementById('add-pg-form');
+      const btn  = document.getElementById('btn-add-pg');
+      const visible = form.classList.contains('visible');
+      form.classList.toggle('visible', !visible);
+      if (!visible) {
+        setTimeout(() => document.getElementById('add-pg-input').focus(), 50);
+      }
+    }
+
+    function confirmAddPG() {
+      const input = document.getElementById('add-pg-input');
+      const name  = input.value.trim();
+      if (!name) return;
+      // Add as option and select it
+      pickPG(name);
+      input.value = '';
+      document.getElementById('add-pg-form').classList.remove('visible');
+    }
+
+    // ── Save button enable ───────────────────────────────────────────────────
+    function checkSave() {
+      const ok = selected.size > 0 && pg !== null && guard !== null;
+      document.getElementById('btn-save').disabled = !ok;
+    }
+  </script>
+
+</body>
+</html>

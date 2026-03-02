@@ -59,35 +59,35 @@ function ActiveSessionCard({
   }, [active.checked_in_at]);
 
   return (
-    <View className="mx-4 mb-3 bg-green-50 border border-green-200 rounded-xl p-4">
-      <View className="flex-row justify-between items-center mb-1">
-        <Text className="text-base font-bold text-green-800">
-          🛝 {active.playground_name}
+    <View
+      className="mx-4 mb-3 bg-white rounded-xl overflow-hidden"
+      style={{ borderWidth: 1, borderColor: '#e5ddd5', borderTopWidth: 3, borderTopColor: '#E07B30' }}
+    >
+      <View className="p-4">
+        <Text className="text-base font-rubik-bold text-gray-900 mb-1">
+          {active.child_names.join(', ')} ב{active.playground_name}
         </Text>
-        <Text className="text-xs text-green-600">{elapsed}</Text>
-      </View>
-
-      <Text className="text-sm text-green-700 mb-3">
-        {active.child_names.join(', ')}
-      </Text>
-
-      <View className="flex-row gap-2">
-        <TouchableOpacity
-          className="flex-1 border border-green-600 rounded-lg py-2 items-center"
-          onPress={onSwitchPlayground}
-        >
-          <Text className="text-green-700 text-sm font-medium">
-            {t('home.switch_playground')}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="flex-1 bg-red-500 rounded-lg py-2 items-center"
-          onPress={onEndVisit}
-        >
-          <Text className="text-white text-sm font-medium">
-            {t('home.end_visit')}
-          </Text>
-        </TouchableOpacity>
+        <Text className="text-sm font-rubik text-gray-400 mb-3">{elapsed}</Text>
+        <View className="flex-row gap-2">
+          <TouchableOpacity
+            className="flex-1 rounded-lg py-3 items-center"
+            style={{ backgroundColor: '#3D7A50' }}
+            onPress={onSwitchPlayground}
+          >
+            <Text className="text-white text-sm font-rubik-bold">
+              {t('home.switch_playground')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-1 rounded-lg py-3 items-center bg-white"
+            style={{ borderWidth: 1.5, borderColor: '#3D7A50' }}
+            onPress={onEndVisit}
+          >
+            <Text className="text-sm font-rubik-bold" style={{ color: '#3D7A50' }}>
+              {t('home.end_visit')}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

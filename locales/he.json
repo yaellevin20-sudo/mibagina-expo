@@ -44,7 +44,17 @@
     "done": "סיום",
     "leaving_confirm": "לצאת מ{{name}}?",
     "search_placeholder": "חפשי גינה",
-    "add_new_with_name": "הוסיפי \"{{name}}\" כגינה חדשה"
+    "add_new_with_name": "הוסיפי \"{{name}}\" כגינה חדשה",
+    "form_title": "הוספת ביקור בגינה",
+    "who_is_coming": "מי מגיע לגינה?",
+    "who_is_coming_hint": "בחרו לפחות ילד אחד",
+    "playground_placeholder": "בחרו גינה מהרשימה",
+    "guardian_label": "מי הולך עם הילדים?",
+    "guardian_placeholder": "בחרו מלווה",
+    "guardian_mom": "עם אמא",
+    "guardian_dad": "עם אבא",
+    "guardian_other": "עם מלווה אחר",
+    "save": "שמירה"
   },
   "children": {
     "siblings_collapsed": "+ {{count}} אחים/אחיות",
@@ -175,10 +185,19 @@
     "back": "חזרה"
   },
   "onboarding": {
+    "name_title": "מה שמכם?",
+    "name_subtitle": "זה מה שיראו חברי הקבוצה שלכם",
     "children_title": "הילדים שלי",
     "children_subtitle": "הוסיפי את הילדים שלך כדי שחברי הקבוצה ידעו מי בגינה",
-    "groups_title": "הקבוצה שלי",
+    "children_empty": "עוד אין פה ילדים",
+    "add_child_cta": "הוספת ילד",
+    "groups_title": "הקבוצות שלי",
     "groups_subtitle": "הצטרפי לקבוצה או צרי קבוצה חדשה עם חברות",
+    "groups_empty": "עוד לא הצטרפת לקבוצה",
+    "create_group_cta": "יצירת קבוצה חדשה",
+    "group_name_placeholder": "שם הקבוצה",
+    "notifications_title": "רוצות לדעת מה קורה?",
+    "notifications_cta": "כן, שלחו לי עדכונים",
     "skip": "דלג",
     "continue": "המשך",
     "done": "סיום"
@@ -191,7 +210,8 @@
     "loading": "טוען...",
     "back_home": "חזור לבית",
     "back": "חזרה",
-    "or": "או"
+    "or": "או",
+    "add": "הוסף"
   },
   "errors": {
     "generic": "אירעה שגיאה. אנא נסה שוב.",

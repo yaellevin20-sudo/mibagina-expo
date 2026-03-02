@@ -44,7 +44,17 @@
     "done": "Done",
     "leaving_confirm": "Leave {{name}}?",
     "search_placeholder": "Search for a playground",
-    "add_new_with_name": "Add \"{{name}}\" as a new playground"
+    "add_new_with_name": "Add \"{{name}}\" as a new playground",
+    "form_title": "Add a visit",
+    "who_is_coming": "Who's coming?",
+    "who_is_coming_hint": "Select at least one child",
+    "playground_placeholder": "Select a playground",
+    "guardian_label": "Who's going with the kids?",
+    "guardian_placeholder": "Choose a guardian",
+    "guardian_mom": "With mom",
+    "guardian_dad": "With dad",
+    "guardian_other": "With another guardian",
+    "save": "Save"
   },
   "children": {
     "siblings_collapsed": "+ {{count}} sibling(s)",
@@ -175,10 +185,19 @@
     "back": "Back"
   },
   "onboarding": {
+    "name_title": "What's your name?",
+    "name_subtitle": "This is what your group members will see",
     "children_title": "My children",
     "children_subtitle": "Add your children so group members know who's at the playground",
-    "groups_title": "My group",
+    "children_empty": "No children yet",
+    "add_child_cta": "Add a child",
+    "groups_title": "My groups",
     "groups_subtitle": "Join an existing group or create a new one with friends",
+    "groups_empty": "You haven't joined a group yet",
+    "create_group_cta": "Create a new group",
+    "group_name_placeholder": "Group name",
+    "notifications_title": "Want to know what's happening?",
+    "notifications_cta": "Yes, send me updates",
     "skip": "Skip",
     "continue": "Continue",
     "done": "Done"
@@ -191,7 +210,8 @@
     "loading": "Loading...",
     "back_home": "Back to home",
     "back": "Back",
-    "or": "or"
+    "or": "or",
+    "add": "Add"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
