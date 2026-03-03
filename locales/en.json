@@ -18,7 +18,11 @@
     "setup_add_children": "Add a child to your account",
     "setup_join_group": "Join a group",
     "notification_denied_banner": "Allow notifications to know when friends are at the playground",
-    "notification_denied_settings": "Open settings"
+    "notification_denied_settings": "Open settings",
+    "notif_banner_title": "Get to the park just in time",
+    "notif_banner_body": "So you don't arrive at an empty park, we'll send you an update when children arrive",
+    "notif_banner_cta": "Enable notifications",
+    "notif_banner_dismiss": "Not now"
   },
   "playground": {
     "title": "Who's here?",

@@ -18,7 +18,11 @@
     "setup_add_children": "הוסיפי ילד לחשבון",
     "setup_join_group": "הצטרפי לקבוצה",
     "notification_denied_banner": "אפשרי התראות כדי לדעת מתי חברים בגינה",
-    "notification_denied_settings": "פתח הגדרות"
+    "notification_denied_settings": "פתח הגדרות",
+    "notif_banner_title": "צאו לגינה בדיוק בזמן",
+    "notif_banner_body": "כדי שלא תגיעו לגינה ריקה, נשלח לכם עדכון כשמגיעים ילדים",
+    "notif_banner_cta": "הפעילו התראות",
+    "notif_banner_dismiss": "לא עכשיו"
   },
   "playground": {
     "title": "מי בגינה?",

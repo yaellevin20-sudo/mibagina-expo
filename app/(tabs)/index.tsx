@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import {
   View,
   Text,
+  Image,
   FlatList,
   TouchableOpacity,
   ScrollView,
@@ -15,6 +16,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
 import { useAuth } from '../../contexts/AuthContext';
+import { registerForPushNotifications } from '../../lib/notifications';
 import {
   getMyGroups,
   getGroupActiveCheckins,
@@ -267,7 +269,8 @@ export default function HomeScreen() {
   const [hasChildren, setHasChildren]     = useState(false);
   const [groupsLoading, setGroupsLoading] = useState(true);
   const [feedLoading, setFeedLoading]     = useState(false);
-  const [notifDenied, setNotifDenied]     = useState(false);
+  const [notifStatus, setNotifStatus]     = useState<string | null>(null);
+  const [notifBannerDismissed, setNotifBannerDismissed] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Load groups + active checkin + children on mount ─────────────────────
@@ -289,7 +292,7 @@ export default function HomeScreen() {
 
     // Check notification permission
     Notifications.getPermissionsAsync()
-      .then(({ status }) => setNotifDenied(status === 'denied'))
+      .then(({ status }) => setNotifStatus(status))
       .catch(() => {});
   }, [user]);
 
@@ -386,6 +389,18 @@ export default function HomeScreen() {
     router.push(`/checkin?step=playground&childIds=${childParam}`);
   }
 
+  // ── Notification banner CTA ───────────────────────────────────────────────
+  async function handleNotifCta() {
+    if (notifStatus === 'denied') {
+      Linking.openSettings();
+    } else {
+      await registerForPushNotifications();
+      const { status } = await Notifications.getPermissionsAsync();
+      setNotifStatus(status);
+      if (status === 'granted') setNotifBannerDismissed(true);
+    }
+  }
+
   // ── Derived state ─────────────────────────────────────────────────────────
   const hasGroups   = groups.length > 0;
   const isOnboarded = hasGroups && hasChildren;
@@ -459,19 +474,48 @@ export default function HomeScreen() {
         )}
       </View>
 
-      {/* Notification permission banner */}
-      {notifDenied && (
-        <TouchableOpacity
-          className="bg-amber-50 border-b border-amber-200 px-4 py-3 flex-row justify-between items-center"
-          onPress={() => Linking.openSettings()}
+      {/* Notification permission banner — card style */}
+      {notifStatus && notifStatus !== 'granted' && !notifBannerDismissed && (
+        <View
+          style={{
+            marginHorizontal: 14,
+            marginTop: 12,
+            backgroundColor: '#F1FDF5',
+            borderWidth: 1,
+            borderColor: '#afafaf',
+            borderRadius: 10,
+            overflow: 'hidden',
+          }}
         >
-          <Text className="text-amber-800 text-sm flex-1 mr-2">
-            {t('home.notification_denied_banner')}
-          </Text>
-          <Text className="text-amber-600 text-sm font-medium">
-            {t('home.notification_denied_settings')}
-          </Text>
-        </TouchableOpacity>
+          <View className="flex-row items-start px-3 pt-2.5 pb-2" style={{ gap: 8 }}>
+            <View className="flex-1">
+              <Text className="text-sm font-rubik-medium text-gray-900 mb-1">
+                {t('home.notif_banner_title')}
+              </Text>
+              <Text className="font-rubik text-gray-700" style={{ fontSize: 11, lineHeight: 16 }}>
+                {t('home.notif_banner_body')}
+              </Text>
+            </View>
+            <Image
+              source={require('../../assets/message.png')}
+              style={{ width: 30, height: 30, marginTop: 2 }}
+              resizeMode="contain"
+            />
+          </View>
+          <View style={{ height: 1, backgroundColor: '#afafaf' }} />
+          <View className="flex-row justify-between items-center px-3.5 py-2.5">
+            <TouchableOpacity onPress={() => setNotifBannerDismissed(true)}>
+              <Text className="font-rubik-medium text-sm" style={{ color: '#767d8b' }}>
+                {t('home.notif_banner_dismiss')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleNotifCta}>
+              <Text className="font-rubik-medium text-sm" style={{ color: '#008234' }}>
+                {t('home.notif_banner_cta')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
 
       {/* Setup banner — Path B */}
