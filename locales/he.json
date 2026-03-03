@@ -187,6 +187,11 @@
     "add_child_first": "הוסיפי ילד עכשיו",
     "already_member": "את כבר חברה בקבוצה הזו"
   },
+  "menu": {
+    "my_children": "הילדים שלי",
+    "my_groups": "הקבוצות שלי",
+    "my_profile": "הפרופיל שלי"
+  },
   "nav": {
     "home": "בית",
     "children": "ילדים",

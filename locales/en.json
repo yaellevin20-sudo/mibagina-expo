@@ -187,6 +187,11 @@
     "add_child_first": "Add a child now",
     "already_member": "You're already a member of this group"
   },
+  "menu": {
+    "my_children": "My Children",
+    "my_groups": "My Groups",
+    "my_profile": "My Profile"
+  },
   "nav": {
     "home": "Home",
     "children": "Children",
