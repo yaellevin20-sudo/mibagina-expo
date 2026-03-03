@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/join/:token", "destination": "/join.html" }
+    { "source": "/join/:token", "destination": "/join.html" },
+    { "source": "/delete-account", "destination": "/delete-account.html" }
   ],
   "headers": [
     {
