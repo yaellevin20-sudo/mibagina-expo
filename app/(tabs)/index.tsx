@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
 import { useAuth } from '../../contexts/AuthContext';
@@ -420,8 +421,8 @@ export default function HomeScreen() {
   // ── Render: loading ───────────────────────────────────────────────────────
   if (groupsLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 items-center justify-center">
-        <ActivityIndicator size="large" color="#16a34a" />
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color="#3D7A50" />
       </SafeAreaView>
     );
   }
@@ -429,62 +430,49 @@ export default function HomeScreen() {
   const selectedGroup = groups.find((g) => g.id === selectedGroupId);
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="px-4 py-4 bg-white border-b border-gray-200">
-        <View className="flex-row justify-between items-center">
-          <Text className="text-xl font-bold text-gray-900">{t('home.title')}</Text>
-          <TouchableOpacity
-            className={`rounded-lg px-4 py-2 ${isOnboarded ? 'bg-green-600' : 'bg-gray-300'}`}
-            onPress={() => {
-              if (!isOnboarded) {
-                Alert.alert(
-                  t('home.setup_banner'),
-                  !hasChildren
-                    ? t('home.setup_add_children')
-                    : t('home.setup_join_group')
-                );
-                return;
-              }
-              router.push('/checkin');
-            }}
-          >
-            <Text className={`font-semibold text-sm ${isOnboarded ? 'text-white' : 'text-gray-500'}`}>
-              {t('checkin.submit')}
-            </Text>
-          </TouchableOpacity>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5' }}>
+      {/* App bar — matches children tab: tree + name on right, menu on left (RTL) */}
+      <View style={{ backgroundColor: '#f1fdf5' }} className="px-6 py-3 flex-row justify-between items-center">
+        <View className="flex-row items-center" style={{ gap: 4 }}>
+          <Image source={require('../../assets/tree.png')} style={{ width: 26, height: 26 }} />
+          <Text className="text-2xl font-rubik-semi text-black">{t('common.app_name')}</Text>
         </View>
-
-        {/* Group selector — shown only when multiple groups */}
-        {groups.length > 1 && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className="mt-3 -mx-1"
-            contentContainerStyle={{ paddingHorizontal: 4 }}
-          >
-            {groups.map((g) => (
-              <TouchableOpacity
-                key={g.id}
-                className={`mr-2 px-3 py-1.5 rounded-full border ${
-                  g.id === selectedGroupId
-                    ? 'bg-green-600 border-green-600'
-                    : 'border-gray-300 bg-white'
-                }`}
-                onPress={() => setSelectedGroupId(g.id)}
-              >
-                <Text
-                  className={`text-sm font-medium ${
-                    g.id === selectedGroupId ? 'text-white' : 'text-gray-700'
-                  }`}
-                >
-                  {g.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        )}
+        <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Ionicons name="menu" size={24} color="black" />
+        </TouchableOpacity>
       </View>
+
+      {/* Group selector — shown only when multiple groups */}
+      {groups.length > 1 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ backgroundColor: '#f1fdf5' }}
+          className="px-5 pb-2"
+          contentContainerStyle={{ paddingHorizontal: 4, gap: 8 }}
+        >
+          {groups.map((g) => (
+            <TouchableOpacity
+              key={g.id}
+              className={`px-3 py-1.5 rounded-full border ${
+                g.id === selectedGroupId
+                  ? 'border-green-600'
+                  : 'border-gray-300 bg-white'
+              }`}
+              style={g.id === selectedGroupId ? { backgroundColor: '#3D7A50' } : {}}
+              onPress={() => setSelectedGroupId(g.id)}
+            >
+              <Text
+                className={`text-sm font-rubik-medium ${
+                  g.id === selectedGroupId ? 'text-white' : 'text-gray-700'
+                }`}
+              >
+                {g.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
 
       {/* Notification permission banner — card style */}
       {notifStatus && notifStatus !== 'granted' && !notifBannerDismissed && (
@@ -533,13 +521,14 @@ export default function HomeScreen() {
       {/* Setup banner — Path B */}
       {!isOnboarded && (
         <TouchableOpacity
-          className="bg-green-50 border-b border-green-200 px-4 py-3 flex-row justify-between items-center"
+          className="mx-3.5 mb-2 rounded-xl px-4 py-3 flex-row justify-between items-center"
+          style={{ backgroundColor: '#d1fae5', borderWidth: 1, borderColor: '#6ee7b7' }}
           onPress={() => {
             if (!hasChildren) router.push('/(tabs)/children');
             else router.push('/(tabs)/groups');
           }}
         >
-          <Text className="text-green-800 text-sm font-medium">
+          <Text className="text-green-800 text-sm font-rubik-medium flex-1 mr-2">
             {t('home.setup_banner')} — {!hasChildren
               ? t('home.setup_add_children')
               : t('home.setup_join_group')}
@@ -575,20 +564,20 @@ export default function HomeScreen() {
       ) : feed.length === 0 ? (
         /* Full-screen empty state */
         <View style={{ flex: 1 }}>
-          {/* Greeting */}
-          <View className="px-6 pt-5 items-end">
+          {/* Greeting — centered, LTR text alignment */}
+          <View className="px-6 pt-5 items-center">
             {profileName ? (
-              <Text className="text-2xl font-rubik-bold text-gray-900">
+              <Text className="text-2xl font-rubik-bold text-gray-900 text-center">
                 {t('home.empty_greeting', { name: profileName })}
               </Text>
             ) : null}
-            <Text className="font-rubik text-sm text-gray-400 mt-0.5">
+            <Text className="font-rubik text-sm text-gray-400 mt-0.5 text-center">
               {t('home.empty_sub')}
             </Text>
           </View>
 
           {/* Illustration + title + CTA */}
-          <View className="flex-1 items-center justify-center px-6" style={{ marginTop: -32 }}>
+          <View className="flex-1 items-center justify-center px-6" style={{ marginTop: -24 }}>
             <Image
               source={require('../../assets/playground.png')}
               style={{ width: 220, height: 220, marginBottom: 20 }}
