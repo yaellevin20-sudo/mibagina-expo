@@ -564,14 +564,14 @@ export default function HomeScreen() {
       ) : feed.length === 0 ? (
         /* Full-screen empty state */
         <View style={{ flex: 1 }}>
-          {/* Greeting — centered, LTR text alignment */}
-          <View className="px-6 pt-5 items-center">
+          {/* Greeting — left-aligned */}
+          <View className="px-6 pt-5 items-start">
             {profileName ? (
-              <Text className="text-2xl font-rubik-bold text-gray-900 text-center">
+              <Text className="text-2xl font-rubik-bold text-gray-900">
                 {t('home.empty_greeting', { name: profileName })}
               </Text>
             ) : null}
-            <Text className="font-rubik text-sm text-gray-400 mt-0.5 text-center">
+            <Text className="font-rubik text-sm text-gray-400 mt-0.5">
               {t('home.empty_sub')}
             </Text>
           </View>
