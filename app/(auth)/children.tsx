@@ -13,6 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { getMyChildren, addChild, type ChildRow } from '../../lib/db/rpc';
@@ -20,6 +21,21 @@ import OnboardingProgress from '../../components/OnboardingProgress';
 
 const BRAND_GREEN = '#3D7A50';
 const BRAND_GREEN_SOFT = '#E4F2EA';
+
+const INPUT_STYLE = {
+  backgroundColor: '#F7FAF8',
+  borderWidth: 1.5,
+  borderColor: 'rgba(0,0,0,0.10)',
+  borderRadius: 10,
+};
+
+const BTN_SHADOW = {
+  shadowColor: BRAND_GREEN,
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.28,
+  shadowRadius: 7,
+  elevation: 6,
+};
 
 export default function ChildrenOnboardingScreen() {
   const { t } = useTranslation();
@@ -91,172 +107,183 @@ export default function ChildrenOnboardingScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      {/* Main content */}
-      <View className="flex-1 px-6">
-        {/* Back button */}
-        <TouchableOpacity className="pt-4 pb-2" onPress={() => router.back()}>
-          <Text className="font-rubik text-sm text-gray-500">{t('nav.back')}</Text>
-        </TouchableOpacity>
-
-        {/* Progress bar */}
-        <View className="pt-4">
-          <OnboardingProgress steps={4} current={2} />
-        </View>
-
-        {/* Header row */}
-        <View className="flex-row justify-between items-center mb-1">
-          <Text className="text-2xl font-rubik-bold text-brand-green-dark">
-            {t('onboarding.children_title')}
-          </Text>
-          <TouchableOpacity onPress={handleSkip}>
-            <Text className="font-rubik text-sm text-gray-400">{t('onboarding.skip')}</Text>
+    <LinearGradient colors={['#FFFFFF', '#F1FDF5']} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* Main content */}
+        <View className="flex-1 px-6">
+          {/* Back button */}
+          <TouchableOpacity className="pt-4 pb-2" onPress={() => router.back()}>
+            <Text className="font-rubik text-sm text-gray-500">{t('nav.back')}</Text>
           </TouchableOpacity>
-        </View>
-        <Text className="font-rubik text-gray-500 mb-6">{t('onboarding.children_subtitle')}</Text>
 
-        {loading ? (
-          <ActivityIndicator size="large" color={BRAND_GREEN} style={{ marginTop: 48 }} />
-        ) : children.length === 0 ? (
-          /* Empty state */
-          <View className="flex-1 items-center justify-center">
-            <Image
-              source={require('../../assets/kite.png')}
-              style={{ width: 120, height: 120, marginBottom: 20 }}
-              resizeMode="contain"
-            />
-            <Text className="text-lg font-rubik-semi text-gray-700 mb-2 text-center">
-              {t('onboarding.children_empty')}
+          {/* Progress bar */}
+          <View className="pt-4">
+            <OnboardingProgress steps={4} current={2} />
+          </View>
+
+          {/* Header row */}
+          <View className="flex-row justify-between items-center mb-1">
+            <Text className="font-rubik-bold text-brand-green-dark" style={{ fontSize: 27 }}>
+              {t('onboarding.children_title')}
             </Text>
-            <Text className="font-rubik text-gray-400 text-center mb-8">
-              {t('onboarding.children_subtitle')}
-            </Text>
-            <TouchableOpacity
-              className="rounded-xl py-3 px-8 items-center"
-              style={{ backgroundColor: BRAND_GREEN_SOFT }}
-              onPress={openSheet}
-            >
-              <Text className="font-rubik-semi text-base" style={{ color: BRAND_GREEN }}>
-                {t('onboarding.add_child_cta')}
-              </Text>
+            <TouchableOpacity onPress={handleSkip}>
+              <Text className="font-rubik text-sm text-gray-400">{t('onboarding.skip')}</Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          /* Children list */
-          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-            {children.map((child) => (
-              <View
-                key={child.id}
-                className="flex-row items-center px-4 py-3 rounded-xl mb-2"
-                style={{ backgroundColor: BRAND_GREEN_SOFT }}
-              >
-                <Text className="font-rubik-semi text-base flex-1" style={{ color: BRAND_GREEN }}>
-                  {child.first_name} {child.last_name}
-                </Text>
-                <Text className="font-rubik text-sm text-gray-500">
-                  {t('children.years_old', { age: child.age_years })}
-                </Text>
-              </View>
-            ))}
+          <Text className="font-rubik text-gray-500 mb-6">{t('onboarding.children_subtitle')}</Text>
 
-            <TouchableOpacity
-              className="rounded-xl py-3 items-center mt-2"
-              style={{ borderWidth: 1, borderColor: BRAND_GREEN }}
-              onPress={openSheet}
-            >
-              <Text className="font-rubik-semi text-base" style={{ color: BRAND_GREEN }}>
-                + {t('onboarding.add_child_cta')}
+          {loading ? (
+            <ActivityIndicator size="large" color={BRAND_GREEN} style={{ marginTop: 48 }} />
+          ) : children.length === 0 ? (
+            /* Empty state */
+            <View className="flex-1 items-center justify-center">
+              <Image
+                source={require('../../assets/kite.png')}
+                style={{ width: 180, height: 180, marginBottom: 24, transform: [{ rotate: '-20deg' }] }}
+                resizeMode="contain"
+              />
+              <Text className="text-xl font-rubik-semi text-black text-center mb-2">
+                {t('onboarding.children_empty')}
               </Text>
-            </TouchableOpacity>
-          </ScrollView>
-        )}
-      </View>
-
-      {/* Continue button — visible when children exist */}
-      {children.length > 0 && (
-        <View className="px-6 pb-6 pt-2">
-          <TouchableOpacity
-            className="rounded-xl py-4 items-center"
-            style={{ backgroundColor: BRAND_GREEN }}
-            onPress={handleContinue}
-          >
-            <Text className="text-white font-rubik-bold text-base">{t('onboarding.continue')}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Add child bottom sheet */}
-      <Modal
-        visible={showSheet}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowSheet(false)}
-      >
-        <Pressable
-          style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}
-          onPress={() => setShowSheet(false)}
-        >
-          <Pressable>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-              <View className="bg-white rounded-t-2xl px-6 pt-4"
-                    style={{ paddingBottom: insets.bottom + 16 }}>
-                {/* Handle */}
-                <View className="items-center mb-4">
-                  <View className="w-10 bg-gray-300 rounded-full" style={{ height: 4 }} />
-                </View>
-
-                <Text className="text-xl font-rubik-bold text-brand-green-dark mb-6">
-                  {t('children.add_child_title')}
+              <Text className="font-rubik text-gray-400 text-center mb-10" style={{ maxWidth: 220 }}>
+                {t('onboarding.children_subtitle')}
+              </Text>
+              <TouchableOpacity
+                className="rounded-xl py-3 px-10 items-center"
+                style={{ backgroundColor: BRAND_GREEN, ...BTN_SHADOW }}
+                onPress={openSheet}
+              >
+                <Text className="font-rubik-bold text-base text-white">
+                  {t('onboarding.add_child_cta')}
                 </Text>
-
-                {formError && (
-                  <Text className="text-red-500 text-sm mb-3 font-rubik">{formError}</Text>
-                )}
-
-                <Text className="text-sm font-rubik-semi text-gray-700 mb-1">{t('children.first_name')}</Text>
-                <TextInput
-                  className="border border-gray-300 rounded-xl px-4 py-3 mb-3 text-base font-rubik"
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  autoFocus
-                  editable={!formLoading}
-                />
-
-                <Text className="text-sm font-rubik-semi text-gray-700 mb-1">{t('children.last_name')}</Text>
-                <TextInput
-                  className="border border-gray-300 rounded-xl px-4 py-3 mb-3 text-base font-rubik"
-                  value={lastName}
-                  onChangeText={setLastName}
-                  editable={!formLoading}
-                />
-
-                <Text className="text-sm font-rubik-semi text-gray-700 mb-1">{t('children.date_of_birth')}</Text>
-                <TextInput
-                  className="border border-gray-300 rounded-xl px-4 py-3 mb-6 text-base font-rubik"
-                  value={dob}
-                  onChangeText={setDob}
-                  placeholder={t('children.date_of_birth_hint')}
-                  keyboardType="numeric"
-                  editable={!formLoading}
-                />
-
-                <TouchableOpacity
-                  className="rounded-xl py-4 items-center"
-                  style={{ backgroundColor: BRAND_GREEN }}
-                  onPress={handleAddChild}
-                  disabled={formLoading}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            /* Children list */
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              {children.map((child) => (
+                <View
+                  key={child.id}
+                  className="flex-row items-center px-4 py-3 rounded-xl mb-2"
+                  style={{ backgroundColor: BRAND_GREEN_SOFT }}
                 >
-                  {formLoading ? (
-                    <ActivityIndicator color="white" />
-                  ) : (
-                    <Text className="text-white font-rubik-bold text-base">{t('children.add_child')}</Text>
+                  <Text className="font-rubik-semi text-base flex-1" style={{ color: BRAND_GREEN }}>
+                    {child.first_name} {child.last_name}
+                  </Text>
+                  <Text className="font-rubik text-sm text-gray-500">
+                    {t('children.years_old', { age: child.age_years })}
+                  </Text>
+                </View>
+              ))}
+
+              <TouchableOpacity
+                className="rounded-xl py-3 items-center mt-2"
+                style={{ borderWidth: 1, borderColor: BRAND_GREEN }}
+                onPress={openSheet}
+              >
+                <Text className="font-rubik-semi text-base" style={{ color: BRAND_GREEN }}>
+                  + {t('onboarding.add_child_cta')}
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          )}
+        </View>
+
+        {/* Continue button — visible when children exist */}
+        {children.length > 0 && (
+          <View className="px-6 pb-6 pt-2">
+            <TouchableOpacity
+              className="rounded-xl py-4 items-center"
+              style={{ backgroundColor: BRAND_GREEN, ...BTN_SHADOW }}
+              onPress={handleContinue}
+            >
+              <Text className="text-white font-rubik-bold text-base">{t('onboarding.continue')}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Add child bottom sheet */}
+        <Modal
+          visible={showSheet}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowSheet(false)}
+        >
+          <Pressable
+            style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}
+            onPress={() => setShowSheet(false)}
+          >
+            <Pressable>
+              <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+                <View className="bg-white rounded-t-2xl px-6 pt-4"
+                      style={{ paddingBottom: insets.bottom + 16 }}>
+                  {/* Handle */}
+                  <View className="items-center mb-4">
+                    <View className="w-10 bg-gray-300 rounded-full" style={{ height: 4 }} />
+                  </View>
+
+                  <Text className="text-xl font-rubik-bold text-brand-green-dark mb-6">
+                    {t('children.add_child_title')}
+                  </Text>
+
+                  {formError && (
+                    <Text className="text-red-500 text-sm mb-3 font-rubik">{formError}</Text>
                   )}
-                </TouchableOpacity>
-              </View>
-            </KeyboardAvoidingView>
+
+                  <Text className="text-xs font-rubik-semi mb-1.5" style={{ color: '#4A5C4E' }}>
+                    {t('children.first_name')}
+                  </Text>
+                  <TextInput
+                    className="rounded-xl px-4 py-3 mb-3 text-base font-rubik"
+                    style={INPUT_STYLE}
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    autoFocus
+                    editable={!formLoading}
+                  />
+
+                  <Text className="text-xs font-rubik-semi mb-1.5" style={{ color: '#4A5C4E' }}>
+                    {t('children.last_name')}
+                  </Text>
+                  <TextInput
+                    className="rounded-xl px-4 py-3 mb-3 text-base font-rubik"
+                    style={INPUT_STYLE}
+                    value={lastName}
+                    onChangeText={setLastName}
+                    editable={!formLoading}
+                  />
+
+                  <Text className="text-xs font-rubik-semi mb-1.5" style={{ color: '#4A5C4E' }}>
+                    {t('children.date_of_birth')}
+                  </Text>
+                  <TextInput
+                    className="rounded-xl px-4 py-3 mb-6 text-base font-rubik"
+                    style={INPUT_STYLE}
+                    value={dob}
+                    onChangeText={setDob}
+                    placeholder={t('children.date_of_birth_hint')}
+                    keyboardType="numeric"
+                    editable={!formLoading}
+                  />
+
+                  <TouchableOpacity
+                    className="rounded-xl py-4 items-center"
+                    style={{ backgroundColor: BRAND_GREEN, ...BTN_SHADOW }}
+                    onPress={handleAddChild}
+                    disabled={formLoading}
+                  >
+                    {formLoading ? (
+                      <ActivityIndicator color="white" />
+                    ) : (
+                      <Text className="text-white font-rubik-bold text-base">{t('children.add_child')}</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </KeyboardAvoidingView>
+            </Pressable>
           </Pressable>
-        </Pressable>
-      </Modal>
-    </SafeAreaView>
+        </Modal>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
