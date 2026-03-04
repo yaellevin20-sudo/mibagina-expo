@@ -305,7 +305,8 @@ export default function GroupDetailScreen() {
   );
 
   function handleShareInvite() {
-    Share.share({ message: `https://mibagina.co.il/join/${inviteToken}` });
+    const link = `https://mibagina.co.il/join/${inviteToken}`;
+    Share.share({ message: t('groups.share_message', { link }) });
   }
 
   function handleDeleteGroup() {

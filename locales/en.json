@@ -95,6 +95,7 @@
     "members_count_one": "1 member",
     "members_count_other": "{{count}} members",
     "share_invite": "Share invite",
+    "share_message": "Join our group on \"Mi BaGina\" – {{link}}\nJoin the group and we'll let you know when friends arrive at the park!",
     "rename": "Rename",
     "rename_title": "Rename group",
     "rename_placeholder": "E.g. 'Narcissus Park' or 'Yochanan St. kids'",
