@@ -8,13 +8,17 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { getMyProfile, updateDisplayName, deleteMyAccount, type ProfileData } from '../../lib/db/rpc';
 import { signOut, changePassword } from '../../lib/auth';
-import { changeEmail, callDeleteAccount } from '../../lib/profile';
+import { callDeleteAccount } from '../../lib/profile';
+
+const BRAND_GREEN = '#3D7A50';
 
 // ---------------------------------------------------------------------------
 // Inline-edit name row
@@ -42,9 +46,19 @@ function NameRow({ profile, onSaved }: { profile: ProfileData; onSaved: (name: s
 
   if (editing) {
     return (
-      <View className="flex-row items-center gap-3">
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <TextInput
-          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 bg-white"
+          style={{
+            flex: 1,
+            borderWidth: 1,
+            borderColor: '#d1d5db',
+            borderRadius: 8,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            fontSize: 15,
+            color: '#111',
+            backgroundColor: 'white',
+          }}
           value={value}
           onChangeText={setValue}
           autoFocus
@@ -52,104 +66,33 @@ function NameRow({ profile, onSaved }: { profile: ProfileData; onSaved: (name: s
           onSubmitEditing={handleSave}
         />
         <TouchableOpacity
-          className="bg-green-600 rounded-lg px-3 py-2"
+          style={{ backgroundColor: BRAND_GREEN, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}
           onPress={handleSave}
           disabled={saving}
         >
           {saving ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
-            <Text className="text-white font-semibold text-sm">{t('common.save')}</Text>
+            <Text style={{ color: 'white', fontWeight: '600', fontSize: 13 }}>{t('common.save')}</Text>
           )}
         </TouchableOpacity>
         <TouchableOpacity
-          className="px-3 py-2"
+          style={{ paddingHorizontal: 8, paddingVertical: 6 }}
           onPress={() => { setValue(profile.name); setEditing(false); }}
         >
-          <Text className="text-gray-500 text-sm">{t('common.cancel')}</Text>
+          <Text style={{ color: '#6b7280', fontSize: 13 }}>{t('common.cancel')}</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View className="flex-row items-center justify-between">
-      <Text className="text-base text-gray-900">{profile.name}</Text>
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Text style={{ fontSize: 16, color: '#111' }}>{profile.name}</Text>
       <TouchableOpacity onPress={() => setEditing(true)}>
-        <Text className="text-green-600 text-sm">{t('profile.edit_name')}</Text>
+        <Text style={{ fontSize: 14, fontWeight: '500', color: BRAND_GREEN }}>{t('profile.edit_name')}</Text>
       </TouchableOpacity>
     </View>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Change Email Modal
-// ---------------------------------------------------------------------------
-function ChangeEmailModal({
-  visible,
-  onClose,
-}: {
-  visible: boolean;
-  onClose: () => void;
-}) {
-  const { t } = useTranslation();
-  const [newEmail, setNewEmail] = useState('');
-  const [saving, setSaving] = useState(false);
-
-  async function handleSubmit() {
-    const trimmed = newEmail.trim().toLowerCase();
-    if (!trimmed) return;
-    setSaving(true);
-    try {
-      await changeEmail(trimmed);
-      Alert.alert(t('common.confirm'), 'Email updated successfully.');
-      setNewEmail('');
-      onClose();
-    } catch (e: any) {
-      if (e.message === 'email_in_use') {
-        Alert.alert(t('errors.generic'), t('errors.email_in_use'));
-      } else {
-        Alert.alert(t('errors.generic'), e.message);
-      }
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 justify-end bg-black/40">
-        <View className="bg-white rounded-t-2xl px-6 pt-6 pb-10">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">{t('profile.change_email')}</Text>
-
-          <Text className="text-sm text-gray-600 mb-1">{t('profile.new_email')}</Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 bg-white mb-4"
-            value={newEmail}
-            onChangeText={setNewEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-          />
-
-          <TouchableOpacity
-            className="bg-green-600 rounded-lg py-3 items-center mb-3"
-            onPress={handleSubmit}
-            disabled={saving}
-          >
-            {saving ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text className="text-white font-semibold">{t('common.save')}</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity className="py-2 items-center" onPress={onClose}>
-            <Text className="text-gray-500">{t('common.cancel')}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
   );
 }
 
@@ -193,22 +136,22 @@ function ChangePasswordModal({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 justify-end bg-black/40">
-        <View className="bg-white rounded-t-2xl px-6 pt-6 pb-10">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">{t('profile.change_password')}</Text>
+      <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}>
+        <View style={{ backgroundColor: 'white', borderTopLeftRadius: 16, borderTopRightRadius: 16, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 40 }}>
+          <Text style={{ fontSize: 17, fontWeight: '600', color: '#111', marginBottom: 20 }}>{t('profile.change_password')}</Text>
 
-          <Text className="text-sm text-gray-600 mb-1">{t('profile.new_password')}</Text>
+          <Text style={{ fontSize: 13, color: '#4A5C4E', marginBottom: 6 }}>{t('profile.new_password')}</Text>
           <TextInput
-            className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 bg-white mb-3"
+            style={{ borderWidth: 1.5, borderColor: 'rgba(0,0,0,0.10)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, backgroundColor: '#F7FAF8', marginBottom: 14 }}
             value={newPwd}
             onChangeText={setNewPwd}
             secureTextEntry
             autoComplete="new-password"
           />
 
-          <Text className="text-sm text-gray-600 mb-1">{t('profile.confirm_password')}</Text>
+          <Text style={{ fontSize: 13, color: '#4A5C4E', marginBottom: 6 }}>{t('profile.confirm_password')}</Text>
           <TextInput
-            className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 bg-white mb-4"
+            style={{ borderWidth: 1.5, borderColor: 'rgba(0,0,0,0.10)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, backgroundColor: '#F7FAF8', marginBottom: 20 }}
             value={confirmPwd}
             onChangeText={setConfirmPwd}
             secureTextEntry
@@ -216,19 +159,19 @@ function ChangePasswordModal({
           />
 
           <TouchableOpacity
-            className="bg-green-600 rounded-lg py-3 items-center mb-3"
+            style={{ backgroundColor: BRAND_GREEN, borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginBottom: 12 }}
             onPress={handleSubmit}
             disabled={saving}
           >
             {saving ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text className="text-white font-semibold">{t('common.save')}</Text>
+              <Text style={{ color: 'white', fontWeight: '700', fontSize: 15 }}>{t('common.save')}</Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity className="py-2 items-center" onPress={onClose}>
-            <Text className="text-gray-500">{t('common.cancel')}</Text>
+          <TouchableOpacity style={{ paddingVertical: 10, alignItems: 'center' }} onPress={onClose}>
+            <Text style={{ color: '#6b7280', fontSize: 14 }}>{t('common.cancel')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -242,18 +185,18 @@ function ChangePasswordModal({
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
-  const [showEmailModal, setShowEmailModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const data = await getMyProfile();
       if (!data) {
-        // Guardian row missing — send to name screen to recreate it
         router.replace('/(auth)/name');
         return;
       }
@@ -289,11 +232,8 @@ export default function ProfileScreen() {
   async function runDeleteAccount() {
     setDeleting(true);
     try {
-      // Step 1: DB-side cleanup (cascade via guardians delete)
       await deleteMyAccount();
-      // Step 2: auth.users deletion via Admin API (Edge Function, retries internally)
       await callDeleteAccount();
-      // Step 3: sign out locally (session is gone, best-effort)
       await signOut().catch(() => {});
     } catch (e: any) {
       setDeleting(false);
@@ -303,95 +243,182 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 items-center justify-center">
-        <ActivityIndicator size="large" color="#16a34a" />
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color={BRAND_GREEN} />
       </SafeAreaView>
     );
   }
 
   if (deleting) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 items-center justify-center px-6">
-        <ActivityIndicator size="large" color="#16a34a" />
-        <Text className="text-gray-500 mt-4 text-base">{t('profile.deleting')}</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
+        <ActivityIndicator size="large" color={BRAND_GREEN} />
+        <Text style={{ color: '#6b7280', marginTop: 16, fontSize: 15 }}>{t('profile.deleting')}</Text>
       </SafeAreaView>
     );
   }
 
   if (!profile) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50 items-center justify-center px-6">
-        <Text className="text-gray-500 text-base text-center">{t('errors.generic')}</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
+        <Text style={{ color: '#6b7280', fontSize: 15, textAlign: 'center' }}>{t('errors.generic')}</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="px-4 py-4 bg-white border-b border-gray-200">
-        <Text className="text-xl font-bold text-gray-900">{t('profile.title')}</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5' }}>
+
+      {/* App bar */}
+      <View style={{ backgroundColor: '#f1fdf5', paddingHorizontal: 24, paddingVertical: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <Image source={require('../../assets/tree.png')} style={{ width: 26, height: 26 }} />
+          <Text className="text-2xl font-rubik-semi text-black">{t('common.app_name')}</Text>
+        </View>
+        <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} onPress={() => setMenuOpen((v) => !v)}>
+          <Ionicons name="menu" size={24} color="black" />
+        </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {/* Display name */}
-        <View className="bg-white rounded-xl p-4 mb-3 shadow-sm border border-gray-100">
-          <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-            {t('profile.display_name')}
-          </Text>
-          <NameRow
-            profile={profile}
-            onSaved={(name) => setProfile((p) => p ? { ...p, name } : p)}
-          />
-        </View>
+      {/* Title row */}
+      <View style={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 12 }}>
+        <Text className="text-3xl font-rubik-semi text-black">{t('profile.title')}</Text>
+      </View>
 
-        {/* Email */}
-        <View className="bg-white rounded-xl p-4 mb-3 shadow-sm border border-gray-100">
-          <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-            {t('profile.email_label')}
-          </Text>
-          <View className="flex-row items-center justify-between">
-            <Text className="text-base text-gray-900 flex-1 mr-2" numberOfLines={1}>
-              {profile.email}
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 80 }}>
+
+        {/* Grouped profile card */}
+        <View style={{ backgroundColor: 'white', borderWidth: 1, borderColor: '#d9d9d9', borderRadius: 10, overflow: 'hidden', marginBottom: 32 }}>
+
+          {/* Display name row */}
+          <View style={{ padding: 14, paddingHorizontal: 16 }}>
+            <Text className="font-rubik-medium" style={{ fontSize: 12, color: '#9ca3af', marginBottom: 5 }}>
+              {t('profile.display_name')}
             </Text>
-            <TouchableOpacity onPress={() => setShowEmailModal(true)}>
-              <Text className="text-green-600 text-sm">{t('profile.change_email')}</Text>
-            </TouchableOpacity>
+            <NameRow
+              profile={profile}
+              onSaved={(name) => setProfile((p) => p ? { ...p, name } : p)}
+            />
           </View>
+
+          <View style={{ height: 1, backgroundColor: '#e5e7eb' }} />
+
+          {/* Email row — display only */}
+          <View style={{ padding: 14, paddingHorizontal: 16 }}>
+            <Text className="font-rubik-medium" style={{ fontSize: 12, color: '#9ca3af', marginBottom: 5 }}>
+              {t('profile.email_label')}
+            </Text>
+            <Text style={{ fontSize: 14, color: '#555' }} numberOfLines={1}>{profile.email}</Text>
+          </View>
+
+          <View style={{ height: 1, backgroundColor: '#e5e7eb' }} />
+
+          {/* Change password row */}
+          <TouchableOpacity style={{ padding: 16, paddingHorizontal: 16 }} onPress={() => setShowPasswordModal(true)}>
+            <Text className="font-rubik-medium" style={{ fontSize: 15, color: BRAND_GREEN }}>{t('profile.change_password')}</Text>
+          </TouchableOpacity>
+
         </View>
 
-        {/* Password */}
-        <View className="bg-white rounded-xl p-4 mb-6 shadow-sm border border-gray-100">
-          <TouchableOpacity onPress={() => setShowPasswordModal(true)}>
-            <Text className="text-base text-green-600">{t('profile.change_password')}</Text>
+        {/* Sign out — green outline secondary button */}
+        <TouchableOpacity
+          style={{ borderWidth: 1.5, borderColor: BRAND_GREEN, borderRadius: 10, padding: 16, alignItems: 'center', backgroundColor: 'white' }}
+          onPress={handleSignOut}
+        >
+          <Text className="font-rubik-semi" style={{ fontSize: 15, color: BRAND_GREEN }}>{t('profile.sign_out')}</Text>
+        </TouchableOpacity>
+
+        {/* Delete account — separated, destructive */}
+        <View style={{ marginTop: 36 }}>
+          <TouchableOpacity
+            style={{ borderWidth: 1, borderColor: '#fecaca', borderRadius: 10, padding: 16, alignItems: 'center', backgroundColor: 'white' }}
+            onPress={confirmDeleteAccount}
+          >
+            <Text className="font-rubik-medium" style={{ fontSize: 15, color: '#ef4444' }}>{t('profile.delete_account')}</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Sign out */}
-        <TouchableOpacity
-          className="bg-white rounded-xl p-4 mb-3 shadow-sm border border-gray-100 items-center"
-          onPress={handleSignOut}
-        >
-          <Text className="text-base font-semibold text-gray-700">{t('profile.sign_out')}</Text>
-        </TouchableOpacity>
-
-        {/* Delete account */}
-        <TouchableOpacity
-          className="bg-white rounded-xl p-4 mb-6 shadow-sm border border-red-100 items-center"
-          onPress={confirmDeleteAccount}
-        >
-          <Text className="text-base font-semibold text-red-500">{t('profile.delete_account')}</Text>
-        </TouchableOpacity>
       </ScrollView>
 
-      <ChangeEmailModal
-        visible={showEmailModal}
-        onClose={() => setShowEmailModal(false)}
-      />
+      {/* FAB — home icon, bottom-right */}
+      <TouchableOpacity
+        onPress={() => router.push('/(tabs)')}
+        style={{
+          position: 'absolute',
+          bottom: 64,
+          left: 16,
+          width: 56,
+          height: 56,
+          borderRadius: 28,
+          backgroundColor: 'white',
+          alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 8,
+        }}
+      >
+        <Image source={require('../../assets/home-fab.png')} style={{ width: 24, height: 24 }} resizeMode="contain" />
+      </TouchableOpacity>
+
+      {/* Hamburger dropdown menu */}
+      {menuOpen && (
+        <>
+          <TouchableOpacity
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}
+            onPress={() => setMenuOpen(false)}
+            activeOpacity={1}
+          />
+          <View style={{
+            position: 'absolute',
+            top: insets.top + 56,
+            right: 12,
+            zIndex: 51,
+            backgroundColor: 'white',
+            borderRadius: 10,
+            width: 160,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 8,
+            elevation: 8,
+            overflow: 'hidden',
+          }}>
+            {([
+              { labelKey: 'menu.my_children', icon: require('../../assets/Heart.png'),  route: '/(tabs)/children' },
+              { labelKey: 'menu.my_groups',   icon: require('../../assets/groups.png'), route: '/(tabs)/groups'   },
+              { labelKey: 'menu.my_profile',  icon: require('../../assets/person.png'), route: '/(tabs)/profile'  },
+            ] as const).map(({ labelKey, icon, route }, idx) => (
+              <TouchableOpacity
+                key={labelKey}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 14,
+                  gap: 10,
+                  height: 48,
+                  borderTopWidth: idx > 0 ? 1 : 0,
+                  borderTopColor: '#f3f4f6',
+                }}
+                onPress={() => { setMenuOpen(false); router.push(route); }}
+              >
+                <Image source={icon} style={{ width: 20, height: 20 }} resizeMode="contain" />
+                <Text style={{ flex: 1, fontSize: 14, fontWeight: '500', color: '#111827', textAlign: 'right' }}>
+                  {t(labelKey)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </>
+      )}
+
       <ChangePasswordModal
         visible={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
       />
+
     </SafeAreaView>
   );
 }

@@ -25,6 +25,7 @@ export default function TabLayout() {
         name="children"
         options={{
           title: t('nav.children'),
+          tabBarStyle: { display: 'none' },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people-outline" size={size} color={color} />
           ),
@@ -34,6 +35,7 @@ export default function TabLayout() {
         name="groups"
         options={{
           title: t('nav.groups'),
+          tabBarStyle: { display: 'none' },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubbles-outline" size={size} color={color} />
           ),
@@ -43,6 +45,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: t('nav.profile'),
+          tabBarStyle: { display: 'none' },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),

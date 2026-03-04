@@ -9,10 +9,10 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { getJoinToken } from '../../lib/auth';
 import {
@@ -100,6 +100,8 @@ export default function ChildrenScreen() {
   const [children, setChildren]           = useState<ChildRow[]>([]);
   const [loading, setLoading]             = useState(true);
   const [pendingJoinToken, setPendingJoinToken] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen]           = useState(false);
+  const insets = useSafeAreaInsets();
 
   const load = useCallback(async () => {
     try {
@@ -173,16 +175,25 @@ export default function ChildrenScreen() {
           <Image source={require('../../assets/tree.png')} style={{ width: 26, height: 26 }} />
           <Text className="text-2xl font-rubik-semi text-black">{t('common.app_name')}</Text>
         </View>
-        <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} onPress={() => setMenuOpen((v) => !v)}>
           <Ionicons name="menu" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
-      {/* Title */}
-      <View className="px-6 pt-5 pb-3">
+      {/* Title + add button row */}
+      <View
+        className="flex-row justify-between items-center"
+        style={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 12 }}
+      >
         <Text className="text-3xl font-rubik-semi text-black">
           {t('onboarding.children_title')}
         </Text>
+        <TouchableOpacity
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          onPress={() => router.push('/add-child')}
+        >
+          <Text className="font-rubik-semi text-base" style={{ color: BRAND_GREEN }}>+ {t('children.add_child')}</Text>
+        </TouchableOpacity>
       </View>
 
       {pendingJoinToken && (
@@ -239,8 +250,8 @@ export default function ChildrenScreen() {
         onPress={() => router.push('/(tabs)')}
         style={{
           position: 'absolute',
-          bottom: 80,
-          left: 20,
+          bottom: 64,
+          left: 16,
           width: 56,
           height: 56,
           borderRadius: 28,
@@ -254,8 +265,59 @@ export default function ChildrenScreen() {
           elevation: 8,
         }}
       >
-        <Ionicons name="home-outline" size={24} color={BRAND_GREEN} />
+        <Image source={require('../../assets/home-fab.png')} style={{ width: 24, height: 24 }} resizeMode="contain" />
       </TouchableOpacity>
+
+      {/* Hamburger dropdown menu */}
+      {menuOpen && (
+        <>
+          <TouchableOpacity
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}
+            onPress={() => setMenuOpen(false)}
+            activeOpacity={1}
+          />
+          <View style={{
+            position: 'absolute',
+            top: insets.top + 56,
+            right: 12,
+            zIndex: 51,
+            backgroundColor: 'white',
+            borderRadius: 10,
+            width: 160,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 8,
+            elevation: 8,
+            overflow: 'hidden',
+          }}>
+            {([
+              { labelKey: 'menu.my_children', icon: require('../../assets/Heart.png'),  route: '/(tabs)/children' },
+              { labelKey: 'menu.my_groups',   icon: require('../../assets/groups.png'), route: '/(tabs)/groups'   },
+              { labelKey: 'menu.my_profile',  icon: require('../../assets/person.png'), route: '/(tabs)/profile'  },
+            ] as const).map(({ labelKey, icon, route }, idx) => (
+              <TouchableOpacity
+                key={labelKey}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 14,
+                  gap: 10,
+                  height: 48,
+                  borderTopWidth: idx > 0 ? 1 : 0,
+                  borderTopColor: '#f3f4f6',
+                }}
+                onPress={() => { setMenuOpen(false); router.push(route); }}
+              >
+                <Image source={icon} style={{ width: 20, height: 20 }} resizeMode="contain" />
+                <Text style={{ flex: 1, fontSize: 14, fontWeight: '500', color: '#111827', textAlign: 'right' }}>
+                  {t(labelKey)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </>
+      )}
 
     </SafeAreaView>
   );

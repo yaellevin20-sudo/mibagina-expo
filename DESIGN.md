@@ -210,8 +210,8 @@ const INPUT_STYLE = {
 <TouchableOpacity
   style={{
     position: 'absolute',
-    bottom: 80,
-    left: 20,  // start in RTL — adjust per screen
+    bottom: 44,
+    left: 16,   // physical LEFT = RTL "end" side
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -221,7 +221,7 @@ const INPUT_STYLE = {
     ...FAB_SHADOW,
   }}
 >
-  <Ionicons name="home-outline" size={24} color="#3D7A50" />
+  <Image source={require('../../assets/home-fab.png')} style={{ width: 24, height: 24 }} resizeMode="contain" />
 </TouchableOpacity>
 ```
 
@@ -246,13 +246,74 @@ const INPUT_STYLE = {
 ### Tab screens (children, groups, profile)
 - **Wrapper**: `SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5' }}`
 - **App bar**: same bg as screen, `px-6 py-3 flex-row justify-between items-center`
-  - Leading: tree icon (`assets/tree.png` 26×26) + app name `text-2xl font-rubik-semi text-black`
-  - Trailing: `Ionicons name="menu"` hamburger
-- **Screen title**: `px-6 pt-5 pb-3`, `text-3xl font-rubik-semi text-black`
+  - RTL: tree icon + app name on physical **RIGHT** (first child), hamburger on physical **LEFT** (second child)
+- **Screen title row**: `px-6 pt-5 pb-3 flex-row justify-between items-center`
+  - RTL: title `text-3xl font-rubik-semi` on physical **RIGHT** (first child), CTA button on physical **LEFT** (second child)
+
+### Hamburger dropdown menu
+```tsx
+// Overlay backdrop
+<TouchableOpacity
+  style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}
+  onPress={() => setMenuOpen(false)}
+  activeOpacity={1}
+/>
+// Menu card — anchored to physical LEFT, below hamburger
+<View style={{ position: 'absolute', top: insets.top + 56, right: 12, zIndex: 51,
+  backgroundColor: 'white', borderRadius: 10, width: 160, overflow: 'hidden', ...shadow }}>
+  {items.map(({ icon, labelKey, route }, idx) => (
+    <TouchableOpacity
+      style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, gap: 10, height: 48,
+        borderTopWidth: idx > 0 ? 1 : 0, borderTopColor: '#f3f4f6' }}
+      onPress={() => { setMenuOpen(false); router.push(route); }}
+    >
+      {/* icon first → physical RIGHT in RTL */}
+      <Image source={icon} style={{ width: 20, height: 20 }} resizeMode="contain" />
+      {/* label second → physical LEFT, text right-aligned */}
+      <Text style={{ flex: 1, fontSize: 14, fontWeight: '500', color: '#111827', textAlign: 'right' }}>
+        {t(labelKey)}
+      </Text>
+    </TouchableOpacity>
+  ))}
+</View>
+```
+
+### Back button (detail screens)
+```tsx
+{/* RTL: arrow first → physical RIGHT, text second → physical LEFT */}
+<TouchableOpacity
+  onPress={() => router.back()}
+  style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+>
+  <Text style={{ fontSize: 18 }}>→</Text>
+  <Text style={{ fontSize: 15, fontWeight: '600' }}>{t('nav.back')}</Text>
+</TouchableOpacity>
+```
+
+### Context / action menu (3-dot, anchored to physical LEFT)
+```tsx
+<View style={{ position: 'absolute', top: insets.top + 60, left: 16, zIndex: 51,
+  backgroundColor: 'white', borderRadius: 10, overflow: 'hidden', ...shadow }}>
+  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' }}>
+    {/* icon first → physical RIGHT in RTL */}
+    <Image source={require('../../assets/menu-edit-icon.png')} style={{ width: 18, height: 18 }} />
+    {/* label second → physical LEFT */}
+    <Text style={{ fontSize: 14, fontWeight: '500', color: '#1d1b20' }}>{t('groups.rename_title')}</Text>
+  </TouchableOpacity>
+  {/* danger item */}
+  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 14, paddingVertical: 12 }}>
+    <Image source={require('../../assets/menu-trash-icon.png')} style={{ width: 18, height: 18 }} />
+    <Text style={{ fontSize: 14, fontWeight: '500', color: 'red' }}>{t('groups.delete_group')}</Text>
+  </TouchableOpacity>
+</View>
+```
 
 ### Home screen
 - **Wrapper**: `SafeAreaView className="flex-1 bg-gray-50"`
-- **Header**: `px-4 py-4 bg-white border-b border-gray-200`, title left + CTA button right
+- **Header**: `px-4 py-4 bg-white border-b border-gray-200`
+  - RTL: title on physical **RIGHT** (first child), CTA button on physical **LEFT** (second child)
 - **Content**: 12px vertical padding, `mx-4` horizontal card margins
 
 ---
@@ -275,9 +336,17 @@ Common Ionicons: `home-outline`, `people-outline`, `chatbubbles-outline`, `perso
 Stored in `assets/` at project root:
 | File | Used for |
 |---|---|
-| `tree.png` | App icon / app bar logo |
+| `tree.png` | App icon / app bar logo (26×26) |
+| `home-fab.png` | FAB home button icon (24×24) |
+| `Heart.png` | Hamburger menu — My Children item (20×20) |
+| `groups.png` | Hamburger menu — My Groups item (20×20) |
+| `person.png` | Hamburger menu — My Profile item (20×20) |
+| `menu-edit-icon.png` | Context menu — rename/edit action (18×18) |
+| `menu-send-icon.png` | Context menu — invite/share action (18×18) |
+| `menu-trash-icon.png` | Context menu — delete action (18×18) |
 | `playground.png` | Home empty state illustration |
 | `kite.png` | Children tab empty state |
+| `seesaw.png` | Groups onboarding illustration |
 | `message.png` | Notification banner icon |
 
 Import pattern: `require('../../assets/tree.png')` (adjust depth as needed)
@@ -286,7 +355,44 @@ Import pattern: `require('../../assets/tree.png')` (adjust depth as needed)
 
 ## Layout & RTL
 
-- App is **RTL by default** (Hebrew). Use `start`/`end` instead of `left`/`right` in logical properties.
+This app is **Hebrew-first and runs in full RTL mode** (`I18nManager.isRTL = true` on target devices). All layout decisions must be designed for RTL.
+
+### The core RTL flex rule
+In RTL, `flexDirection: 'row'` flows **right → left**:
+- **First child in JSX** → appears on the physical **RIGHT**
+- **Second child in JSX** → appears to the physical **LEFT** of the first
+
+Design with this in mind: put the "leading" element (avatar, icon, back arrow) first in JSX so it lands on the right.
+
+### Flex layout examples
+| Pattern | JSX order | Visual result (RTL) |
+|---|---|---|
+| App bar | `[brand-name]` then `[hamburger]` | brand on RIGHT, hamburger on LEFT |
+| Title row | `[screen-title]` then `[CTA-btn]` | title on RIGHT, button on LEFT |
+| Group card | `[emoji]` then `[info-view]` | emoji on RIGHT, text fills LEFT |
+| Member row | `[avatar]` then `[info-view]` | avatar on RIGHT, text fills LEFT |
+| Menu item | `[icon]` then `[label]` | icon on RIGHT, text to its LEFT |
+| Back button | `[→ arrow]` then `[text]` | arrow on RIGHT, text to its LEFT |
+| Name + badge | `[name]` then `[badge]` | name on RIGHT, badge immediately to its LEFT |
+
+### Absolute positioning (NOT affected by RTL)
+`position: 'absolute'` uses physical coordinates. Use explicit physical values:
+- **FAB**: `left: 16, bottom: 44` (physical left = RTL end side)
+- **Hamburger dropdown**: `right: 12, top: insets.top + 56` (anchored under hamburger)
+- **3-dot context menu**: `left: 16, top: insets.top + 60` (anchored under dots button which is on physical left)
+- **Overlay backdrop**: `top: 0, left: 0, right: 0, bottom: 0`
+
+### Text alignment
+- Text in flex containers inherits RTL and is right-aligned by default
+- Explicitly set `textAlign: 'right'` on standalone `Text` nodes outside flex to be safe
+- Do **not** use `textAlign: 'left'`
+
+### What NOT to use
+- `marginLeft` / `marginRight` → use `gap` or `marginStart`/`marginEnd` for logical spacing
+- `left`/`right` as flex-aware positioning → use flex order instead
+- `direction: 'ltr'` overrides — only override if a specific element truly needs LTR (e.g. email input)
+
+### Standard spacing
 - Standard horizontal padding: `px-4` (cards) or `px-6` (screen content)
 - Standard card gap: `mb-3`
 - `SafeAreaView` wraps every screen root — never use raw `View` at screen level

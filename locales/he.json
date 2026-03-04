@@ -124,7 +124,12 @@
     "select_child_label": "ילדים",
     "select_child_placeholder": "בחר ילדים",
     "add_child_option": "הוסף ילד",
-    "child_required": "יש לבחור לפחות ילד אחד"
+    "child_required": "יש לבחור לפחות ילד אחד",
+    "admins_section": "מנהלי הקבוצה",
+    "members_section": "חברי הקבוצה",
+    "edit": "עריכה",
+    "invite_to_group": "הזמינו לקבוצה",
+    "member_count": "{{count}} חברים בקבוצה"
   },
   "auth": {
     "email": "אימייל",

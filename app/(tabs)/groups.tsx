@@ -14,19 +14,20 @@ import {
   ScrollView,
   Keyboard,
   Pressable,
+  Image,
 } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
-import { useAuth } from '../../contexts/AuthContext';
 import {
   getMyGroups,
   getMyChildren,
   addChild,
   createGroup,
   renameGroup,
-  setGroupEmoji,
   regenerateInviteToken,
   removeGuardianFromGroup,
   removeChildFromGroup,
@@ -44,7 +45,7 @@ import {
 // ---------------------------------------------------------------------------
 // Text input modal (reused for Create & Rename)
 // ---------------------------------------------------------------------------
-function TextInputModal({
+export function TextInputModal({
   visible,
   title,
   placeholder,
@@ -431,7 +432,7 @@ function CreateGroupModal({
 // ---------------------------------------------------------------------------
 // Members Modal
 // ---------------------------------------------------------------------------
-function MembersModal({
+export function MembersModal({
   visible,
   groupId,
   isAdmin,
@@ -704,151 +705,17 @@ function TransferOwnershipModal({
 // ---------------------------------------------------------------------------
 // Group Card
 // ---------------------------------------------------------------------------
+const BRAND_GREEN = '#3D7A50';
+
 function GroupCard({
   group,
-  currentUserId,
   onRefresh,
 }: {
   group: GroupRow;
-  currentUserId: string;
   onRefresh: () => void;
 }) {
   const { t } = useTranslation();
-  const [showRename, setShowRename]             = useState(false);
-  const [showMembers, setShowMembers]           = useState(false);
-  const [showTransferOwnership, setShowTransferOwnership] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker]   = useState(false);
-  const [localEmoji, setLocalEmoji]             = useState<string | null>(group.emoji);
-
-  useEffect(() => { setLocalEmoji(group.emoji); }, [group.emoji]);
-
-  async function handleEmojiSelect(emoji: string | null) {
-    const prev = localEmoji;
-    setLocalEmoji(emoji);
-    setShowEmojiPicker(false);
-    try {
-      await setGroupEmoji(group.id, emoji);
-      onRefresh();
-    } catch (e: any) {
-      setLocalEmoji(prev);
-      Alert.alert(t('errors.generic'), e.message);
-    }
-  }
-
-  // Sole admin with no children in guardian_child_groups → show Delete only
-  const isOnlyMember = group.is_admin && group.member_count <= 1;
-  // Admin with no children enrolled (e.g. just created group) → keep Leave visible
-  const isAdminWithNoChildren = group.is_admin && group.my_children.length === 0 && group.member_count > 1;
-
-  function handleShareInvite() {
-    Share.share({ message: `https://mibagina.co.il/join/${group.invite_token}` });
-  }
-
-  function handleRegenerateInvite() {
-    Alert.alert(
-      t('groups.regenerate_invite'),
-      t('groups.confirm_regenerate'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.confirm'),
-          onPress: async () => {
-            try {
-              await regenerateInviteToken(group.id);
-              onRefresh();
-            } catch (e: any) {
-              Alert.alert(t('errors.generic'), e.message);
-            }
-          },
-        },
-      ]
-    );
-  }
-
-  function handleLeaveGroup() {
-    if (group.is_admin && group.member_count > 1) {
-      // Admin with other members must transfer ownership first
-      setShowTransferOwnership(true);
-      return;
-    }
-    Alert.alert(
-      t('groups.leave_group'),
-      '',
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('groups.leave_group'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeGuardianFromGroup(group.id, currentUserId);
-              onRefresh();
-            } catch (e: any) {
-              Alert.alert(t('errors.generic'), e.message);
-            }
-          },
-        },
-      ]
-    );
-  }
-
-  async function handleRemoveMyChild(child: { child_id: string; first_name: string }) {
-    try {
-      const ctx = await getChildGroupContext(group.id, child.child_id);
-      const willLeaveGroup = ctx.is_last_child_for_me;
-      const msg = willLeaveGroup
-        ? t('groups.confirm_remove_guardian', { name: child.first_name })
-        : t('groups.confirm_remove_child', { name: child.first_name });
-
-      Alert.alert(msg, '', [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.confirm'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeChildFromGroup(group.id, child.child_id);
-              onRefresh();
-            } catch (e: any) {
-              Alert.alert(t('errors.generic'), e.message);
-            }
-          },
-        },
-      ]);
-    } catch (e: any) {
-      Alert.alert(t('errors.generic'), e.message);
-    }
-  }
-
-  function handleDeleteGroup() {
-    Alert.alert(
-      t('groups.delete_group'),
-      t('groups.confirm_delete_group', { name: group.name }),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('groups.delete_group'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteGroup(group.id);
-              onRefresh();
-            } catch (e: any) {
-              const isCheckinError = e.message?.includes('Active check-ins exist');
-              Alert.alert(
-                isCheckinError
-                  ? t('groups.delete_active_checkins_error_title')
-                  : t('errors.generic'),
-                isCheckinError
-                  ? t('groups.delete_active_checkins_error')
-                  : e.message
-              );
-            }
-          },
-        },
-      ]
-    );
-  }
+  const router = useRouter();
 
   const childLabel =
     group.child_count === 1
@@ -856,155 +723,65 @@ function GroupCard({
       : t('groups.children_count_other', { count: group.child_count });
 
   return (
-    <View className="bg-white rounded-xl mx-4 mb-3 p-4 shadow-sm border border-gray-100">
-      {/* Title row */}
-      <View className="flex-row justify-between items-center">
-        <Text className="text-lg font-semibold text-gray-900 flex-1 mr-2">{group.name}</Text>
-        <View className="flex-row items-center gap-2">
+    <TouchableOpacity
+      style={{
+        marginHorizontal: 16,
+        marginBottom: 10,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#d9d9d9',
+        paddingVertical: 18,
+        paddingHorizontal: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+      }}
+      onPress={() =>
+        router.push({
+          pathname: '/group/[id]',
+          params: {
+            id: group.id,
+            name: group.name,
+            emoji: group.emoji ?? '',
+            isAdmin: group.is_admin ? '1' : '0',
+            memberCount: String(group.member_count),
+            inviteToken: group.invite_token,
+          },
+        })
+      }
+      activeOpacity={0.7}
+    >
+      {/* Emoji — first child → physical RIGHT in RTL */}
+      <Text style={{ fontSize: 38, lineHeight: 46, flexShrink: 0 }}>
+        {group.emoji ?? '🌳'}
+      </Text>
+
+      {/* Info — second child → physical LEFT in RTL */}
+      <View style={{ flex: 1 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <Text className="text-lg font-rubik-medium text-black" style={{ flexShrink: 1 }}>
+            {group.name}
+          </Text>
           {group.is_admin && (
-            <View className="bg-green-100 rounded px-2 py-0.5">
-              <Text className="text-green-700 text-xs">{t('groups.admin_badge')}</Text>
+            <View
+              style={{
+                backgroundColor: 'rgba(0, 215, 87, 0.26)',
+                borderRadius: 5,
+                paddingHorizontal: 7,
+                paddingVertical: 2,
+                flexShrink: 0,
+              }}
+            >
+              <Text style={{ fontSize: 10, fontWeight: '700' }}>{t('groups.admin_badge')}</Text>
             </View>
           )}
-          {group.is_admin ? (
-            <TouchableOpacity onPress={() => setShowEmojiPicker(true)}>
-              <Text className="text-2xl">{localEmoji ?? '\uFF0B'}</Text>
-            </TouchableOpacity>
-          ) : localEmoji ? (
-            <Text className="text-2xl">{localEmoji}</Text>
-          ) : null}
         </View>
+        <Text className="text-sm font-rubik text-gray-500" style={{ textAlign: 'right' }}>
+          {childLabel}
+        </Text>
       </View>
-
-      <Text className="text-sm text-gray-500 mt-1">{childLabel}</Text>
-
-      {/* My children in this group (with remove buttons for non-admin self-remove) */}
-      {group.my_children.length > 0 && (
-        <View className="mt-2">
-          {group.my_children.map((c) => (
-            <View key={c.child_id} className="flex-row justify-between items-center py-0.5">
-              <Text className="text-sm text-gray-600">{c.first_name} {c.last_name}</Text>
-              <TouchableOpacity onPress={() => handleRemoveMyChild(c)}>
-                <Text className="text-red-400 text-xs">{t('children.remove_child')}</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-      )}
-
-      {/* Actions */}
-      <View className="mt-3 flex-row flex-wrap gap-2">
-        <TouchableOpacity
-          className="border border-green-600 rounded-lg px-3 py-2"
-          onPress={handleShareInvite}
-        >
-          <Text className="text-green-600 text-sm">{t('groups.share_invite')}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          className="border border-gray-300 rounded-lg px-3 py-2"
-          onPress={() => setShowMembers(true)}
-        >
-          <Text className="text-gray-600 text-sm">{t('groups.view_members')}</Text>
-        </TouchableOpacity>
-
-        {group.is_admin && (
-          <>
-            <TouchableOpacity
-              className="border border-gray-300 rounded-lg px-3 py-2"
-              onPress={() => setShowRename(true)}
-            >
-              <Text className="text-gray-600 text-sm">{t('groups.rename')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="border border-orange-300 rounded-lg px-3 py-2"
-              onPress={handleRegenerateInvite}
-            >
-              <Text className="text-orange-600 text-sm">{t('groups.regenerate_invite')}</Text>
-            </TouchableOpacity>
-          </>
-        )}
-
-        {/* Leave group — sole owner uses Delete. Admin with no children keeps Leave. */}
-        {(isAdminWithNoChildren) && (
-          <TouchableOpacity
-            className="border border-red-200 rounded-lg px-3 py-2"
-            onPress={handleLeaveGroup}
-          >
-            <Text className="text-red-500 text-sm">{t('groups.leave_group')}</Text>
-          </TouchableOpacity>
-        )}
-
-        {/* Delete group — admin only */}
-        {group.is_admin && (
-          <TouchableOpacity
-            className="border border-red-400 rounded-lg px-3 py-2"
-            onPress={handleDeleteGroup}
-          >
-            <Text className="text-red-600 text-sm font-semibold">{t('groups.delete_group')}</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Rename modal */}
-      <TextInputModal
-        visible={showRename}
-        title={t('groups.rename_title')}
-        initialValue={group.name}
-        submitLabel={t('common.save')}
-        onClose={() => setShowRename(false)}
-        onSubmit={async (name) => {
-          await renameGroup(group.id, name);
-          setShowRename(false);
-          onRefresh();
-        }}
-      />
-
-      {/* Members modal */}
-      <MembersModal
-        visible={showMembers}
-        groupId={group.id}
-        isAdmin={group.is_admin}
-        currentUserId={currentUserId}
-        onClose={() => setShowMembers(false)}
-        onChanged={onRefresh}
-      />
-
-      {/* Transfer ownership modal (admin leaving with other members) */}
-      <TransferOwnershipModal
-        visible={showTransferOwnership}
-        group={group}
-        currentUserId={currentUserId}
-        onClose={() => setShowTransferOwnership(false)}
-        onDone={() => {
-          setShowTransferOwnership(false);
-          onRefresh();
-        }}
-      />
-
-      {/* Emoji picker modal */}
-      <Modal
-        visible={showEmojiPicker}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowEmojiPicker(false)}
-      >
-        <View className="flex-1 justify-end bg-black/40">
-          <View className="bg-white rounded-t-2xl" style={{ maxHeight: '65%' }}>
-            <TouchableOpacity
-              className="items-center py-3"
-              onPress={() => handleEmojiSelect(null)}
-            >
-              <Text className="text-red-500">{t('groups.remove_emoji')}</Text>
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <EmojiKeyboard onEmojiSelected={(item) => handleEmojiSelect(item.emoji)} />
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -1013,19 +790,18 @@ function GroupCard({
 // ---------------------------------------------------------------------------
 export default function GroupsScreen() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [groups, setGroups]         = useState<GroupRow[]>([]);
   const [loading, setLoading]       = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [menuOpen, setMenuOpen]     = useState(false);
 
-  // Track known group names by ID so we can toast when one disappears.
   const knownGroupsRef = useRef<Map<string, string>>(new Map());
 
   const load = useCallback(async () => {
     try {
       const data = await getMyGroups();
-
-      // Show a toast for any group that was known but is now gone.
       if (knownGroupsRef.current.size > 0) {
         for (const [id, name] of knownGroupsRef.current) {
           if (!data.find((g) => g.id === id)) {
@@ -1034,7 +810,6 @@ export default function GroupsScreen() {
         }
       }
       knownGroupsRef.current = new Map(data.map((g) => [g.id, g.name]));
-
       setGroups(data);
     } catch (e) {
       console.error('[groups] load error', e);
@@ -1043,40 +818,67 @@ export default function GroupsScreen() {
     }
   }, [t]);
 
-  useEffect(() => { load(); }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load])
+  );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="flex-row justify-between items-center px-4 py-4 bg-white border-b border-gray-200">
-        <Text className="text-xl font-bold text-gray-900">{t('nav.groups')}</Text>
-        <TouchableOpacity onPress={() => setShowCreate(true)}>
-          <Text className="text-green-600 font-semibold text-base">{t('groups.create')}</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5' }}>
+
+      {/* App bar */}
+      <View style={{ backgroundColor: '#f1fdf5' }} className="px-6 py-3 flex-row justify-between items-center">
+        <View className="flex-row items-center" style={{ gap: 4 }}>
+          <Image source={require('../../assets/tree.png')} style={{ width: 26, height: 26 }} />
+          <Text className="text-2xl font-rubik-semi text-black">{t('common.app_name')}</Text>
+        </View>
+        <TouchableOpacity
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          onPress={() => setMenuOpen((v) => !v)}
+        >
+          <Ionicons name="menu" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Title + create button row */}
+      <View
+        className="flex-row justify-between items-center"
+        style={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 12 }}
+      >
+        <Text className="text-3xl font-rubik-semi text-black">{t('onboarding.groups_title')}</Text>
+        <TouchableOpacity
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          onPress={() => setShowCreate(true)}
+        >
+          <Text className="font-rubik-semi text-base" style={{ color: BRAND_GREEN }}>+ {t('groups.create')}</Text>
         </TouchableOpacity>
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#16a34a" style={{ marginTop: 48 }} />
+        <ActivityIndicator size="large" color={BRAND_GREEN} style={{ marginTop: 48 }} />
       ) : (
         <FlatList
           data={groups}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <GroupCard
-              group={item}
-              currentUserId={user?.id ?? ''}
-              onRefresh={load}
-            />
-          )}
+          renderItem={({ item }) => <GroupCard group={item} onRefresh={load} />}
           contentContainerStyle={{ paddingVertical: 12 }}
           ListEmptyComponent={
             <View className="items-center justify-center mt-16 px-6">
-              <Text className="text-gray-500 text-base text-center">{t('groups.no_groups')}</Text>
+              <Text className="text-base text-center font-rubik" style={{ color: '#6b7280' }}>
+                {t('groups.no_groups')}
+              </Text>
               <TouchableOpacity
-                className="mt-6 bg-green-600 rounded-lg px-8 py-3"
+                style={{
+                  backgroundColor: BRAND_GREEN,
+                  borderRadius: 8,
+                  marginTop: 24,
+                  paddingHorizontal: 32,
+                  paddingVertical: 12,
+                }}
                 onPress={() => setShowCreate(true)}
               >
-                <Text className="text-white font-semibold">{t('groups.create')}</Text>
+                <Text className="text-white font-rubik-semi">{t('groups.create')}</Text>
               </TouchableOpacity>
             </View>
           }
@@ -1089,6 +891,87 @@ export default function GroupsScreen() {
         onClose={() => setShowCreate(false)}
         onCreated={() => { setShowCreate(false); load(); }}
       />
+
+      {/* FAB — home icon, bottom-right */}
+      <TouchableOpacity
+        onPress={() => router.push('/(tabs)')}
+        style={{
+          position: 'absolute',
+          bottom: 64,
+          left: 16,
+          width: 56,
+          height: 56,
+          borderRadius: 28,
+          backgroundColor: 'white',
+          alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 8,
+        }}
+      >
+        <Image
+          source={require('../../assets/home-fab.png')}
+          style={{ width: 24, height: 24 }}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
+
+      {/* Hamburger dropdown menu */}
+      {menuOpen && (
+        <>
+          <TouchableOpacity
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}
+            onPress={() => setMenuOpen(false)}
+            activeOpacity={1}
+          />
+          <View
+            style={{
+              position: 'absolute',
+              top: insets.top + 56,
+              right: 12,
+              zIndex: 51,
+              backgroundColor: 'white',
+              borderRadius: 10,
+              width: 160,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.15,
+              shadowRadius: 8,
+              elevation: 8,
+              overflow: 'hidden',
+            }}
+          >
+            {([
+              { labelKey: 'menu.my_children', icon: require('../../assets/Heart.png'),  route: '/(tabs)/children' },
+              { labelKey: 'menu.my_groups',   icon: require('../../assets/groups.png'), route: '/(tabs)/groups'   },
+              { labelKey: 'menu.my_profile',  icon: require('../../assets/person.png'), route: '/(tabs)/profile'  },
+            ] as const).map(({ labelKey, icon, route }, idx) => (
+              <TouchableOpacity
+                key={labelKey}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 14,
+                  gap: 10,
+                  height: 48,
+                  borderTopWidth: idx > 0 ? 1 : 0,
+                  borderTopColor: '#f3f4f6',
+                }}
+                onPress={() => { setMenuOpen(false); router.push(route); }}
+              >
+                <Image source={icon} style={{ width: 20, height: 20 }} resizeMode="contain" />
+                <Text style={{ flex: 1, fontSize: 14, fontWeight: '500', color: '#111827', textAlign: 'right' }}>
+                  {t(labelKey)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </>
+      )}
+
     </SafeAreaView>
   );
 }

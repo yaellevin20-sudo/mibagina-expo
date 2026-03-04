@@ -124,7 +124,12 @@
     "select_child_label": "Children",
     "select_child_placeholder": "Select children",
     "add_child_option": "Add a child",
-    "child_required": "Please select at least one child"
+    "child_required": "Please select at least one child",
+    "admins_section": "Group Admins",
+    "members_section": "Group Members",
+    "edit": "Edit",
+    "invite_to_group": "Invite to Group",
+    "member_count": "{{count}} members"
   },
   "auth": {
     "email": "Email",
