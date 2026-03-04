@@ -131,7 +131,15 @@
     "members_section": "חברי הקבוצה",
     "edit": "עריכה",
     "invite_to_group": "הזמינו לקבוצה",
-    "member_count": "{{count}} חברים בקבוצה"
+    "member_count_one": "חבר אחד בקבוצה",
+    "member_count": "{{count}} חברים בקבוצה",
+    "you_indicator": "(את/ה)",
+    "edit_members_title": "עריכת חברי קבוצה",
+    "remove_selected": "הסרה",
+    "remove_selected_count": "הסרה ({{count}})",
+    "confirm_remove_members_title": "הסרת חברי קבוצה",
+    "confirm_remove_members_sure": "האם אתם בטוחים?",
+    "confirm_remove_members_body": "הילדים שנבחרו יוסרו מהקבוצה, והוריהם יקבלו על כך התראה."
   },
   "auth": {
     "email": "אימייל",

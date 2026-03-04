@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import EmojiPicker, { type EmojiType } from 'rn-emoji-keyboard';
 
 const { width: screenWidth } = Dimensions.get('window');
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -285,7 +285,6 @@ export default function GroupDetailScreen() {
   const [showRename, setShowRename]         = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editingAdmins, setEditingAdmins]   = useState(false);
-  const [editingMembers, setEditingMembers] = useState(false);
 
   const isAdminBool = isAdmin === '1';
 
@@ -297,12 +296,38 @@ export default function GroupDetailScreen() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  useEffect(() => { loadMembers(); }, [loadMembers]);
+  useFocusEffect(useCallback(() => { loadMembers(); }, [loadMembers]));
 
   const admins      = members.filter((m) => m.is_admin);
   const allChildren = members.flatMap((m) =>
     m.children.map((c) => ({ ...c, guardianId: m.guardian_id }))
   );
+
+  function confirmLeaveGroup() {
+    if (isAdminBool && admins.length === 1) {
+      Alert.alert(t('groups.last_admin_error'));
+      return;
+    }
+    Alert.alert(
+      t('groups.leave_group'),
+      '',
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('groups.leave_group'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await removeGuardianFromGroup(id as string, user!.id);
+              router.back();
+            } catch (e: any) {
+              Alert.alert(t('errors.generic'), e.message);
+            }
+          },
+        },
+      ]
+    );
+  }
 
   function handleShareInvite() {
     const link = `https://mibagina.co.il/join/${inviteToken}`;
@@ -463,7 +488,7 @@ export default function GroupDetailScreen() {
           {groupName}
         </Text>
         <Text style={{ fontSize: 14, fontWeight: '500', color: '#555', marginTop: 2 }}>
-          {t('groups.member_count', { count: Number(memberCount ?? 0) })}
+          {t('groups.member_count', { count: loading && members.length === 0 ? Number(memberCount ?? 0) : members.length })}
         </Text>
       </View>
 
@@ -533,7 +558,7 @@ export default function GroupDetailScreen() {
                       </Text>
                     </View>
                     {admin.guardian_id === user?.id && (
-                      <Text style={{ fontSize: 12, color: '#767d8b' }}>(את/ה)</Text>
+                      <Text style={{ fontSize: 12, color: '#767d8b' }}>{t('groups.you_indicator')}</Text>
                     )}
                   </View>
                 </View>
@@ -568,7 +593,7 @@ export default function GroupDetailScreen() {
               {t('groups.members_section')}
             </Text>
             {isAdminBool && (
-              <TouchableOpacity onPress={() => setEditingMembers((v) => !v)}>
+              <TouchableOpacity onPress={() => router.push({ pathname: '/group/edit-members', params: { id } })}>
                 <Text style={{ fontSize: 13, fontWeight: '600', color: '#767d8b' }}>
                   {t('groups.edit')}
                 </Text>
@@ -614,20 +639,29 @@ export default function GroupDetailScreen() {
                   </Text>
                 </View>
 
-                {/* Remove button (edit mode) */}
-                {editingMembers && (
-                  <TouchableOpacity
-                    onPress={() => confirmRemoveChild(child.child_id, child.first_name)}
-                  >
-                    <Text style={{ color: '#ef4444', fontSize: 13 }}>
-                      {t('children.remove_child')}
-                    </Text>
-                  </TouchableOpacity>
-                )}
               </View>
             ))
           )}
         </View>
+
+        {/* Leave group */}
+        <TouchableOpacity
+          onPress={confirmLeaveGroup}
+          style={{
+            marginTop: 16,
+            marginHorizontal: 16,
+            borderWidth: 1,
+            borderColor: '#fecaca',
+            borderRadius: 10,
+            padding: 14,
+            alignItems: 'center',
+            backgroundColor: 'white',
+          }}
+        >
+          <Text style={{ fontSize: 14, fontWeight: '500', color: '#ef4444' }}>
+            {t('groups.leave_group')}
+          </Text>
+        </TouchableOpacity>
 
         <View style={{ height: 80 }} />
       </ScrollView>

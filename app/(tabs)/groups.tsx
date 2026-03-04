@@ -28,7 +28,6 @@ import {
   addChild,
   createGroup,
   renameGroup,
-  regenerateInviteToken,
   removeGuardianFromGroup,
   removeChildFromGroup,
   getGroupMembers,
@@ -894,7 +893,7 @@ export default function GroupsScreen() {
 
       {/* FAB — home icon, bottom-right */}
       <TouchableOpacity
-        onPress={() => router.push('/(tabs)')}
+        onPress={() => router.replace('/(tabs)')}
         style={{
           position: 'absolute',
           bottom: 64,
@@ -960,7 +959,7 @@ export default function GroupsScreen() {
                   borderTopWidth: idx > 0 ? 1 : 0,
                   borderTopColor: '#f3f4f6',
                 }}
-                onPress={() => { setMenuOpen(false); router.push(route); }}
+                onPress={() => { setMenuOpen(false); router.replace(route); }}
               >
                 <Image source={icon} style={{ width: 20, height: 20 }} resizeMode="contain" />
                 <Text style={{ flex: 1, fontSize: 14, fontWeight: '500', color: '#111827', textAlign: 'right' }}>

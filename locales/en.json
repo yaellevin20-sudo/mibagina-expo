@@ -131,7 +131,15 @@
     "members_section": "Group Members",
     "edit": "Edit",
     "invite_to_group": "Invite to Group",
-    "member_count": "{{count}} members"
+    "member_count_one": "1 member",
+    "member_count": "{{count}} members",
+    "you_indicator": "(you)",
+    "edit_members_title": "Edit group members",
+    "remove_selected": "Remove",
+    "remove_selected_count": "Remove ({{count}})",
+    "confirm_remove_members_title": "Remove group members",
+    "confirm_remove_members_sure": "Are you sure?",
+    "confirm_remove_members_body": "The selected children will be removed from the group, and their parents will be notified."
   },
   "auth": {
     "email": "Email",
