@@ -387,8 +387,8 @@ export default function ProfileScreen() {
             overflow: 'hidden',
           }}>
             {([
-              { labelKey: 'menu.my_children', icon: require('../../assets/Heart.png'),  route: '/(tabs)/children' },
-              { labelKey: 'menu.my_groups',   icon: require('../../assets/groups.png'), route: '/(tabs)/groups'   },
+              { labelKey: 'menu.my_children', icon: require('../../assets/icons/Heart.png'),  route: '/(tabs)/children' },
+              { labelKey: 'menu.my_groups',   icon: require('../../assets/icons/groups.png'), route: '/(tabs)/groups'   },
               { labelKey: 'menu.my_profile',  icon: require('../../assets/person.png'), route: '/(tabs)/profile'  },
             ] as const).map(({ labelKey, icon, route }, idx) => (
               <TouchableOpacity

@@ -708,7 +708,7 @@ export default function GroupDetailScreen() {
               onPress={() => { setMenuOpen(false); setShowRename(true); }}
             >
               <Image
-                source={require('../../assets/menu-edit-icon.png')}
+                source={require('../../assets/icons/Edit.png')}
                 style={{ width: 18, height: 18 }}
                 resizeMode="contain"
               />
@@ -731,7 +731,7 @@ export default function GroupDetailScreen() {
               onPress={() => { setMenuOpen(false); handleShareInvite(); }}
             >
               <Image
-                source={require('../../assets/menu-send-icon.png')}
+                source={require('../../assets/icons/Send.png')}
                 style={{ width: 18, height: 18 }}
                 resizeMode="contain"
               />
@@ -752,7 +752,7 @@ export default function GroupDetailScreen() {
               onPress={() => { setMenuOpen(false); handleDeleteGroup(); }}
             >
               <Image
-                source={require('../../assets/menu-trash-icon.png')}
+                source={require('../../assets/icons/Trash.png')}
                 style={{ width: 18, height: 18 }}
                 resizeMode="contain"
               />
