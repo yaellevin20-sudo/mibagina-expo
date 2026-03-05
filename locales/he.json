@@ -114,6 +114,7 @@
     "confirm_remove_child": "להסיר את {{name}} מהקבוצה?",
     "confirm_regenerate": "לחדש את קישור ההזמנה? הקישור הנוכחי יפסיק לעבוד.",
     "group_deleted_toast": "הקבוצה \"{{name}}\" כבר לא קיימת",
+    "renamed_toast": "שם הקבוצה עודכן ל\"{{name}}\"",
     "last_admin_error": "לא ניתן להסיר את המנהל האחרון — מנה מנהל אחר תחילה",
     "admin_badge": "מנהל",
     "children_count_one": "ילד אחד",

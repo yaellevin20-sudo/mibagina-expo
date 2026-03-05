@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Feature Graphic – Mi Bagina</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Rubik', sans-serif;
+      gap: 20px;
+    }
+
+    .wrapper {
+      position: relative;
+      width: 1024px;
+      height: 500px;
+      overflow: hidden;
+      border-radius: 4px;
+      background: #F4FBF6;
+    }
+
+    /* Subtle gradient wash */
+    .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #ffffff 0%, #EDF7F1 50%, #E0F2E8 100%);
+    }
+
+    /* Soft radial glow center-left where text lives */
+    .glow {
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(61,122,80,0.06) 0%, transparent 65%);
+      top: -200px;
+      left: -100px;
+    }
+
+    /* ── SVG illustration ── */
+    .trees {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Text ── */
+    .content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      direction: rtl;
+      text-align: center;
+      gap: 0;
+    }
+
+    .eyebrow {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      color: #3D7A50;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      opacity: 0.8;
+    }
+
+    .headline {
+      font-size: 100px;
+      font-weight: 900;
+      line-height: 1;
+      color: #1A3325;
+      letter-spacing: -0.03em;
+      margin-bottom: 22px;
+    }
+
+    .tagline {
+      font-size: 21px;
+      font-weight: 400;
+      color: #4A7A5C;
+      letter-spacing: 0.01em;
+    }
+
+    /* Bottom brand mark */
+    .brand-strip {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-dot { width: 5px; height: 5px; border-radius: 50%; background: #A8D4B6; }
+    .brand-name { font-size: 12px; font-weight: 500; color: #A8D4B6; letter-spacing: 0.14em; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="bg"></div>
+  <div class="glow"></div>
+
+
+  <div class="content">
+    <div class="eyebrow">לדעת מי בגינה לפני שיוצאים</div>
+    <div class="headline">🌳 מי בגינה?</div>
+    <div class="tagline">האפליקציה שמחברת הורים בשכונה</div>
+  </div>
+
+  <div class="brand-strip">
+    <div class="brand-dot"></div>
+    <div class="brand-name">Mi Bagina</div>
+    <div class="brand-dot"></div>
+  </div>
+</div>
+
+<div style="color:#999; font-family:sans-serif; font-size:13px;">
+  1024 × 500px · screenshot or right-click → save
+</div>
+
+</body>
+</html>

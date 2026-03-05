@@ -29,6 +29,8 @@ import {
   getChildGroupContext,
   type GroupMember,
 } from '../../lib/db/rpc';
+import Toast from 'react-native-toast-message';
+import { notifyGroupRenamed } from '../../lib/notifications';
 
 const BRAND_GREEN = '#3D7A50';
 
@@ -771,11 +773,14 @@ export default function GroupDetailScreen() {
         groupEmoji={savedEmoji}
         onClose={() => setShowRename(false)}
         onSave={async (name, newEmoji) => {
+          const oldName = groupName;
           await renameGroup(id as string, name);
           if (newEmoji !== savedEmoji) await setGroupEmojiRpc(id as string, newEmoji);
           setGroupName(name);
           setSavedEmoji(newEmoji);
           setShowRename(false);
+          Toast.show({ text1: t('groups.renamed_toast', { name }) });
+          if (name !== oldName) notifyGroupRenamed(id as string, oldName, name);
         }}
       />
 

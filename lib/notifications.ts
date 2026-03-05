@@ -32,6 +32,13 @@ export type GroupDeletedPayload = {
   group_name: string;
 };
 
+export type GroupRenamedPayload = {
+  type: 'group_renamed';
+  group_id: string;
+  old_name: string;
+  new_name: string;
+};
+
 // -----------------------------------------------------------------------
 // setupAndroidChannel
 // -----------------------------------------------------------------------
@@ -103,6 +110,24 @@ export async function registerForPushNotifications(): Promise<void> {
 // The dispatch-notifications edge function (runs every minute) claims due
 // batches and sends bundled Expo pushes. Non-critical — silent on error.
 // -----------------------------------------------------------------------
+export async function notifyGroupRenamed(groupId: string, oldName: string, newName: string): Promise<void> {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const url = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/notify-group-renamed`;
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ group_id: groupId, old_name: oldName, new_name: newName }),
+    });
+  } catch (e) {
+    console.warn('[notify] notifyGroupRenamed error', e);
+  }
+}
+
 export async function enqueueGroupNotification(playgroundId: string): Promise<void> {
   try {
     const { error } = await supabase.rpc('enqueue_group_notification', {

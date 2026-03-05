@@ -73,7 +73,7 @@ Deno.serve(async (req: Request) => {
   for (const target of notifyList) {
     const childNames = target.children.map((c) => c.first_name).join(', ') || '';
     const body = childNames
-      ? `${childNames} at ${target.playground_name}`
+      ? `${childNames} ב${target.playground_name}`
       : target.playground_name;
 
     try {
@@ -82,7 +82,7 @@ Deno.serve(async (req: Request) => {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           to:       target.expo_push_token,
-          title:    'חברים בגינה! / Friends at the playground!',
+          title:    `${target.group_name} – חברים בגינה! 🌳`,
           body,
           data: {
             type:            'group_checkin',

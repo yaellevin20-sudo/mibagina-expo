@@ -15,7 +15,7 @@ import i18n from '../lib/i18n';
 import { StillThereModal } from '../components/StillThereModal';
 import { SplashAnimation } from '../components/SplashAnimation';
 import { respondStillThere, leaveCheckin } from '../lib/db/rpc';
-import type { StillTherePayload, GroupCheckinPayload, GroupDeletedPayload } from '../lib/notifications';
+import type { StillTherePayload, GroupCheckinPayload, GroupDeletedPayload, GroupRenamedPayload } from '../lib/notifications';
 
 // Enforce RTL/LTR on app init. A restart is required after toggling.
 const isHebrew = i18n.language === 'he';
@@ -87,7 +87,7 @@ function RootNavigator() {
   // 1. Foreground: notification received while app is open
   useEffect(() => {
     const sub = Notifications.addNotificationReceivedListener((n) => {
-      const d = n.request.content.data as StillTherePayload | GroupCheckinPayload | GroupDeletedPayload | undefined;
+      const d = n.request.content.data as StillTherePayload | GroupCheckinPayload | GroupDeletedPayload | GroupRenamedPayload | undefined;
       if (!d) return;
       if (d.type === 'still_there_prompt') setPendingPrompt(d as StillTherePayload);
       if (d.type === 'group_checkin') {
@@ -111,6 +111,13 @@ function RootNavigator() {
           },
         });
       }
+      if (d.type === 'group_renamed') {
+        const payload = d as GroupRenamedPayload;
+        Toast.show({
+          text1: `"${payload.old_name}" שונה ל-"${payload.new_name}"`,
+          onPress: () => { Toast.hide(); router.push('/(tabs)/groups'); },
+        });
+      }
     });
     return () => sub.remove();
   }, []);
@@ -118,7 +125,7 @@ function RootNavigator() {
   // 2. Warm-start: user tapped notification (or quick-action button), app was backgrounded
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((r) => {
-      const d = r.notification.request.content.data as StillTherePayload | GroupCheckinPayload | GroupDeletedPayload | undefined;
+      const d = r.notification.request.content.data as StillTherePayload | GroupCheckinPayload | GroupDeletedPayload | GroupRenamedPayload | undefined;
       if (!d) return;
 
       // Handle still_there quick-action buttons (no app-open required but may open app)
@@ -150,6 +157,9 @@ function RootNavigator() {
       if (d.type === 'group_deleted') {
         router.push('/(tabs)/groups');
       }
+      if (d.type === 'group_renamed') {
+        router.push('/(tabs)/groups');
+      }
     });
     return () => sub.remove();
   }, []);
@@ -162,7 +172,7 @@ function RootNavigator() {
     coldStartHandled.current = true;
     Notifications.getLastNotificationResponseAsync().then((r) => {
       if (!r) return;
-      const d = r.notification.request.content.data as StillTherePayload | GroupCheckinPayload | GroupDeletedPayload | undefined;
+      const d = r.notification.request.content.data as StillTherePayload | GroupCheckinPayload | GroupDeletedPayload | GroupRenamedPayload | undefined;
       if (!d) return;
 
       if (d.type === 'still_there_prompt') {
@@ -188,6 +198,9 @@ function RootNavigator() {
         router.push(`/playground/${(d as GroupCheckinPayload).playground_id}`);
       }
       if (d.type === 'group_deleted') {
+        router.push('/(tabs)/groups');
+      }
+      if (d.type === 'group_renamed') {
         router.push('/(tabs)/groups');
       }
     });

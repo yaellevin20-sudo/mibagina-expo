@@ -114,6 +114,7 @@
     "confirm_remove_child": "Remove {{name}} from this group?",
     "confirm_regenerate": "Regenerate invite link? The current link will stop working.",
     "group_deleted_toast": "The group \"{{name}}\" no longer exists",
+    "renamed_toast": "Group renamed to \"{{name}}\"",
     "last_admin_error": "Cannot remove the last admin — assign another admin first",
     "admin_badge": "Admin",
     "children_count_one": "1 child",
