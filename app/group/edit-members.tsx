@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 import {
   getGroupMembers,
   removeChildFromGroup,
@@ -61,6 +62,7 @@ export default function EditMembersScreen() {
       setSelected(new Set());
       const refreshed = await getGroupMembers(id);
       setMembers(refreshed);
+      Toast.show({ type: 'success', text1: t('groups.members_removed_toast') });
     } catch (e: any) {
       setShowModal(false);
       Alert.alert(t('errors.generic'), e.message);

@@ -888,7 +888,7 @@ export default function GroupsScreen() {
       <CreateGroupModal
         visible={showCreate}
         onClose={() => setShowCreate(false)}
-        onCreated={() => { setShowCreate(false); load(); }}
+        onCreated={() => { setShowCreate(false); load(); Toast.show({ type: 'success', text1: t('groups.group_created_toast') }); }}
       />
 
       {/* FAB — home icon, bottom-right */}

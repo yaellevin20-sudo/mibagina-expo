@@ -205,7 +205,8 @@ export default function JoinScreen() {
       const result = await joinGroup({ token, group_id: groupId, child_ids: childIds });
 
       if (result.status === 'already_member') {
-        setPhase({ name: 'already_member', groupName: result.group_name });
+        Toast.show({ type: 'info', text1: t('join.already_member') });
+        router.replace('/(tabs)/groups');
         return;
       }
 

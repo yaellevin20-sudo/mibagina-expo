@@ -353,10 +353,15 @@ export default function GroupDetailScreen() {
     } catch (e: any) {
       setShowDeleteModal(false);
       const isCheckinError = e.message?.includes('Active check-ins exist');
-      Alert.alert(
-        isCheckinError ? t('groups.delete_active_checkins_error_title') : t('errors.generic'),
-        isCheckinError ? t('groups.delete_active_checkins_error') : e.message
-      );
+      if (isCheckinError) {
+        Toast.show({
+          type: 'error',
+          text1: t('groups.delete_active_checkins_error_title'),
+          text2: t('groups.delete_active_checkins_error'),
+        });
+      } else {
+        Alert.alert(t('errors.generic'), e.message);
+      }
     }
   }
 

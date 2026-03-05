@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import Toast from 'react-native-toast-message';
 import { addChild } from '../lib/db/rpc';
 
 const BRAND_GREEN = '#3D7A50';
@@ -145,6 +146,7 @@ export default function AddChildScreen() {
     setLoading(true);
     try {
       await addChild(f, l, d);
+      Toast.show({ type: 'success', text1: t('children.child_added_toast') });
       router.back();
     } catch (e: any) {
       setError(e.message ?? t('errors.generic'));
