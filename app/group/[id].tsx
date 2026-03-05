@@ -84,8 +84,8 @@ function DeleteGroupModal({
           {/* Body */}
           <View style={{ padding: 20, paddingBottom: 12 }}>
             {/* Header: RTL → title RIGHT (first), × LEFT (second) */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-              <Text style={{ fontSize: 18, fontWeight: '600', color: '#111', flex: 1, textAlign: 'right' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <Text style={{ fontSize: 18, fontWeight: '600', color: '#111' }}>
                 {t('groups.delete_group')}
               </Text>
               <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>

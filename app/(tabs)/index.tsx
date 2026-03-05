@@ -339,8 +339,12 @@ export default function HomeScreen() {
       ]);
       setFeed(data);
       setActiveCheckin(active);
-    } catch (e) {
+    } catch (e: any) {
       console.error('[home] poll error', e);
+      // Group was deleted or access lost — reset so the focus effect can recover
+      if (e?.code === 'P0001' || e?.message?.includes('Access denied')) {
+        setSelectedGroupId(null);
+      }
     } finally {
       setFeedLoading(false);
     }

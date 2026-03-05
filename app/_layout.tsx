@@ -8,7 +8,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
-import Toast, { BaseToast, ErrorToast, type BaseToastProps } from 'react-native-toast-message';
+import Toast, { type BaseToastProps } from 'react-native-toast-message';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import i18n from '../lib/i18n';
@@ -23,34 +23,41 @@ if (I18nManager.isRTL !== isHebrew) {
   I18nManager.forceRTL(isHebrew);
 }
 
-// Compact toast config — constrained width, colored left border.
-const TOAST_W = 320;
-const toastStyle: BaseToastProps['style'] = {
-  width: TOAST_W,
-  minHeight: 48,
-  borderRadius: 10,
-  paddingVertical: 8,
-  paddingHorizontal: 4,
-};
-const text1Style: BaseToastProps['text1Style'] = {
-  fontSize: 13,
-  fontWeight: '400',
-  fontFamily: 'Rubik_400Regular',
-};
-const text2Style: BaseToastProps['text2Style'] = {
-  fontSize: 11.5,
-  fontFamily: 'Rubik_400Regular',
-};
+// Fully custom compact toast — avoids BaseToast sizing quirks.
+function CompactToast({ type, text1, text2 }: BaseToastProps) {
+  const borderColor = type === 'error' ? '#dc2626' : type === 'info' ? '#9ca3af' : '#3D7A50';
+  return (
+    <View style={{
+      width: 280,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      borderRightWidth: 3,
+      borderRightColor: borderColor,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.10,
+      shadowRadius: 6,
+      elevation: 4,
+    }}>
+      {!!text1 && (
+        <Text style={{ fontSize: 13, color: '#111827', fontFamily: 'Rubik_400Regular', textAlign: 'right' }}>
+          {text1}
+        </Text>
+      )}
+      {!!text2 && (
+        <Text style={{ fontSize: 11.5, color: '#6b7280', fontFamily: 'Rubik_400Regular', marginTop: 2, textAlign: 'right' }}>
+          {text2}
+        </Text>
+      )}
+    </View>
+  );
+}
 const toastConfig = {
-  success: (props: BaseToastProps) => (
-    <BaseToast {...props} style={{ ...toastStyle, borderLeftColor: '#3D7A50' }} text1Style={text1Style} text2Style={text2Style} />
-  ),
-  error: (props: BaseToastProps) => (
-    <ErrorToast {...props} style={{ ...toastStyle, borderLeftColor: '#dc2626' }} text1Style={text1Style} text2Style={text2Style} />
-  ),
-  info: (props: BaseToastProps) => (
-    <BaseToast {...props} style={{ ...toastStyle, borderLeftColor: '#9ca3af' }} text1Style={text1Style} text2Style={text2Style} />
-  ),
+  success: (props: BaseToastProps) => <CompactToast {...props} />,
+  error:   (props: BaseToastProps) => <CompactToast {...props} />,
+  info:    (props: BaseToastProps) => <CompactToast {...props} />,
 };
 
 // Handle notifications when the app is open (foreground).
