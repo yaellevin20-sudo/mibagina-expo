@@ -212,7 +212,7 @@ export default function JoinScreen() {
 
       if (result.status === 'done') {
         await clearJoinToken();
-        Toast.show({ type: 'success', text1: t('join.success_toast'), position: 'top', visibilityTime: 3000 });
+        Toast.show({ type: 'success', text1: t('join.success_toast'), visibilityTime: 3000 });
         router.replace('/(tabs)/groups');
         return;
       }
@@ -244,7 +244,7 @@ export default function JoinScreen() {
 
       if (final.status === 'done') {
         await clearJoinToken();
-        Toast.show({ type: 'success', text1: t('join.success_toast'), position: 'top', visibilityTime: 3000 });
+        Toast.show({ type: 'success', text1: t('join.success_toast'), visibilityTime: 3000 });
         router.replace('/(tabs)/groups');
       }
     } catch (e: any) {

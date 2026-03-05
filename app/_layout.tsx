@@ -2,13 +2,13 @@ import '../global.css';
 import '../lib/i18n';
 
 import { useEffect, useRef, useState } from 'react';
-import { I18nManager } from 'react-native';
+import { I18nManager, View, Text } from 'react-native';
 import { useFonts, Rubik_400Regular, Rubik_500Medium, Rubik_600SemiBold, Rubik_700Bold } from '@expo-google-fonts/rubik';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
-import Toast from 'react-native-toast-message';
+import Toast, { BaseToast, ErrorToast, type BaseToastProps } from 'react-native-toast-message';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import i18n from '../lib/i18n';
@@ -22,6 +22,36 @@ const isHebrew = i18n.language === 'he';
 if (I18nManager.isRTL !== isHebrew) {
   I18nManager.forceRTL(isHebrew);
 }
+
+// Compact toast config — constrained width, colored left border.
+const TOAST_W = 320;
+const toastStyle: BaseToastProps['style'] = {
+  width: TOAST_W,
+  minHeight: 48,
+  borderRadius: 10,
+  paddingVertical: 8,
+  paddingHorizontal: 4,
+};
+const text1Style: BaseToastProps['text1Style'] = {
+  fontSize: 13,
+  fontWeight: '400',
+  fontFamily: 'Rubik_400Regular',
+};
+const text2Style: BaseToastProps['text2Style'] = {
+  fontSize: 11.5,
+  fontFamily: 'Rubik_400Regular',
+};
+const toastConfig = {
+  success: (props: BaseToastProps) => (
+    <BaseToast {...props} style={{ ...toastStyle, borderLeftColor: '#3D7A50' }} text1Style={text1Style} text2Style={text2Style} />
+  ),
+  error: (props: BaseToastProps) => (
+    <ErrorToast {...props} style={{ ...toastStyle, borderLeftColor: '#dc2626' }} text1Style={text1Style} text2Style={text2Style} />
+  ),
+  info: (props: BaseToastProps) => (
+    <BaseToast {...props} style={{ ...toastStyle, borderLeftColor: '#9ca3af' }} text1Style={text1Style} text2Style={text2Style} />
+  ),
+};
 
 // Handle notifications when the app is open (foreground).
 // StillThereModal handles its own UI; group_checkin uses Toast.
@@ -230,7 +260,7 @@ export default function RootLayout() {
       <AuthProvider>
         <RootNavigator />
       </AuthProvider>
-      <Toast />
+      <Toast position="bottom" bottomOffset={80} config={toastConfig} />
     </GestureHandlerRootView>
   );
 }
