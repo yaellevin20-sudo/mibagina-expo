@@ -78,7 +78,7 @@
     "first_name": "First name",
     "last_name": "Last name",
     "date_of_birth": "Date of birth",
-    "date_of_birth_hint": "YYYY-MM-DD",
+    "date_of_birth_hint": "Select date of birth",
     "confirm_remove": "Remove {{name}}?",
     "years_old": "Age {{age}}",
     "member_of_groups": "Member of:",

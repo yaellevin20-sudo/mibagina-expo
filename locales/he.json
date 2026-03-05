@@ -78,7 +78,7 @@
     "first_name": "שם פרטי",
     "last_name": "שם משפחה",
     "date_of_birth": "תאריך לידה",
-    "date_of_birth_hint": "YYYY-MM-DD",
+    "date_of_birth_hint": "בחר תאריך לידה",
     "confirm_remove": "להסיר את {{name}}?",
     "years_old": "בן/בת {{age}}",
     "member_of_groups": "חבר בקבוצות:",
