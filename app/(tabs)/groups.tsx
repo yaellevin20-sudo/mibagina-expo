@@ -13,7 +13,6 @@ import {
   Share,
   ScrollView,
   Keyboard,
-  Pressable,
   Image,
 } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
@@ -230,9 +229,10 @@ function CreateGroupModal({
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [groupName, setGroupName]           = useState('');
+  const [emoji, setEmoji]                   = useState<string | null>(null);
+  const [emojiOpen, setEmojiOpen]           = useState(false);
   const [children, setChildren]             = useState<ChildRow[]>([]);
   const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set());
-  const [showPicker, setShowPicker]         = useState(false);
   const [pendingGroupId, setPendingGroupId] = useState<string | null>(null);
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState<string | null>(null);
@@ -241,10 +241,11 @@ function CreateGroupModal({
   useEffect(() => {
     if (visible) {
       setGroupName(initialDraft?.groupName ?? '');
+      setEmoji(initialDraft?.emoji ?? null);
       setSelectedChildIds(new Set(initialDraft?.selectedIds ?? []));
       setPendingGroupId(null);
       setError(null);
-      setShowPicker(false);
+      setEmojiOpen(false);
       getMyChildren().then((list) => {
         setChildren(list);
         // Auto-select newly added child that came back from add-child screen
@@ -285,154 +286,151 @@ function CreateGroupModal({
     }
   }
 
-  const selectedLabel =
-    selectedChildIds.size === 0
-      ? t('groups.select_child_placeholder')
-      : children
-          .filter((c) => selectedChildIds.has(c.id))
-          .map((c) => c.first_name)
-          .join(', ');
-
   if (!visible) return null;
 
   return (
     <>
       <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-        <SafeAreaView className="flex-1 bg-white">
-          <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-            {/* Header */}
-            <View className="flex-row justify-between items-center px-4 py-4 border-b border-gray-200">
-              <TouchableOpacity onPress={onClose} disabled={loading}>
-                <Text className="text-gray-500 text-base">{t('common.cancel')}</Text>
-              </TouchableOpacity>
-              <Text className="text-lg font-semibold">{t('groups.create_group_title')}</Text>
-              <View style={{ width: 56 }} />
-            </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5' }}>
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 
-            {/* Form */}
-            <ScrollView className="flex-1 px-4 pt-6">
-              {error && <Text className="text-red-500 text-sm mb-4">{error}</Text>}
-
-              <Text className="text-sm font-medium text-gray-700 mb-1">{t('groups.group_name')}</Text>
-              <TextInput
-                className="border border-gray-300 rounded-lg px-4 py-3 mb-6 text-base"
-                value={groupName}
-                onChangeText={setGroupName}
-                placeholder={t('groups.group_name')}
-                autoFocus
-                editable={!loading}
-                returnKeyType="done"
-              />
-
-              <Text className="text-sm font-medium text-gray-700 mb-1">{t('groups.select_child_label')}</Text>
+            {/* Back button */}
+            <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4 }}>
               <TouchableOpacity
-                className="border border-gray-300 rounded-lg px-4 py-3 mb-4 flex-row justify-between items-center"
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setShowPicker(true);
-                }}
+                onPress={onClose}
                 disabled={loading}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Text
-                  className="text-base flex-1"
-                  style={{ color: selectedChildIds.size === 0 ? '#9ca3af' : '#111827' }}
-                >
-                  {selectedLabel}
-                </Text>
-                <Text className="text-gray-400 text-sm ml-2">▼</Text>
-              </TouchableOpacity>
-
-            </ScrollView>
-
-            {/* Footer */}
-            <View className="px-4 pb-6 pt-2">
-              <TouchableOpacity
-                className={`rounded-lg py-4 items-center ${canSubmit ? 'bg-green-600' : 'bg-gray-300'}`}
-                onPress={handleCreate}
-                disabled={!canSubmit}
-              >
-                {loading ? (
-                  <ActivityIndicator color="white" />
-                ) : (
-                  <Text className="text-white font-semibold text-base">{t('groups.create_group_title')}</Text>
-                )}
+                <Text style={{ fontSize: 18 }}>→</Text>
+                <Text style={{ fontSize: 15, fontWeight: '600', fontFamily: 'Rubik' }}>{t('common.cancel')}</Text>
               </TouchableOpacity>
             </View>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
-      </Modal>
 
-      {/* Child picker bottom sheet — sibling modal, RN renders to root window */}
-      <Modal
-        visible={showPicker}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowPicker(false)}
-      >
-        <Pressable
-          style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}
-          onPress={() => setShowPicker(false)}
-        >
-          <Pressable>
-            <View className="bg-white rounded-t-2xl" style={{ maxHeight: '60%' }}>
-              {/* Handle bar */}
-              <View className="items-center pt-3 pb-2">
-                <View className="w-10 rounded-full bg-gray-300" style={{ height: 4 }} />
-              </View>
+            {/* Title */}
+            <Text style={{ fontSize: 35, fontWeight: '700', color: '#111', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32, textAlign: 'right', fontFamily: 'Rubik_700Bold' }}>
+              {t('groups.create_group_title')}
+            </Text>
 
-              {/* Picker header */}
-              <View className="flex-row justify-between items-center px-4 pb-3 border-b border-gray-200">
-                <Text className="text-base font-semibold">{t('groups.select_child_label')}</Text>
-                <TouchableOpacity onPress={() => setShowPicker(false)}>
-                  <Text className="text-green-600 font-semibold">{t('onboarding.done')}</Text>
+            <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
+              {error && <Text style={{ color: '#ef4444', fontSize: 13, paddingHorizontal: 16, marginBottom: 8, textAlign: 'right' }}>{error}</Text>}
+
+              {/* Group name label */}
+              <Text style={{ fontSize: 15, fontWeight: '600', color: '#111', textAlign: 'right', paddingHorizontal: 16, marginBottom: 10, fontFamily: 'Rubik_600SemiBold' }}>
+                {t('groups.group_name')}
+              </Text>
+
+              {/* Name input row with emoji button */}
+              <View style={{ marginHorizontal: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#111', borderRadius: 10, height: 48, backgroundColor: 'white', marginBottom: 28 }}>
+                {/* Emoji button — physical right in RTL */}
+                <TouchableOpacity
+                  onPress={() => { Keyboard.dismiss(); setEmojiOpen(true); }}
+                  style={{ paddingHorizontal: 12, height: '100%', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                  hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+                >
+                  <Text style={{ fontSize: 22 }}>{emoji ?? '🌳'}</Text>
                 </TouchableOpacity>
+                <View style={{ width: 1, height: 28, backgroundColor: '#d1d5db' }} />
+                <TextInput
+                  style={{ flex: 1, paddingHorizontal: 12, fontSize: 16, color: '#111', textAlign: 'right', fontFamily: 'Rubik' }}
+                  value={groupName}
+                  onChangeText={setGroupName}
+                  placeholder={t('groups.rename_placeholder')}
+                  placeholderTextColor="#aaa"
+                  autoFocus
+                  editable={!loading}
+                  returnKeyType="done"
+                />
               </View>
 
-              <ScrollView>
+              {/* Children chips label */}
+              <Text style={{ fontSize: 15, fontWeight: '600', color: '#111', textAlign: 'right', paddingHorizontal: 16, marginBottom: 12, fontFamily: 'Rubik_600SemiBold' }}>
+                {t('groups.select_child_label')}
+              </Text>
+
+              {/* Chips row */}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 16, marginBottom: 40, direction: 'rtl' } as any}>
                 {children.map((child) => {
                   const isSelected = selectedChildIds.has(child.id);
                   return (
                     <TouchableOpacity
                       key={child.id}
-                      className="flex-row items-center px-4 py-3 border-b border-gray-100"
                       onPress={() => toggleChild(child.id)}
+                      style={{
+                        borderWidth: 1.5,
+                        borderColor: BRAND_GREEN,
+                        borderRadius: 8,
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        backgroundColor: isSelected ? BRAND_GREEN : 'white',
+                      }}
                     >
-                      <View
-                        className={`w-6 h-6 rounded-full border-2 mr-3 items-center justify-center ${
-                          isSelected ? 'bg-green-600 border-green-600' : 'border-gray-300'
-                        }`}
-                      >
-                        {isSelected && <Text className="text-white text-xs font-bold">✓</Text>}
-                      </View>
-                      <Text className="text-base text-gray-900">
-                        {child.first_name} {child.last_name}
+                      <Text style={{ fontSize: 15, color: isSelected ? 'white' : BRAND_GREEN, fontFamily: 'Rubik' }}>
+                        {child.first_name}
                       </Text>
                     </TouchableOpacity>
                   );
                 })}
 
-                {/* Add a child row — navigates to add-child screen */}
+                {/* Add child chip */}
                 <TouchableOpacity
-                  className="flex-row items-center px-4 py-4"
-                  onPress={() => {
-                    setShowPicker(false);
-                    onNavigateToAddChild({
-                      groupName,
-                      selectedIds: [...selectedChildIds],
-                      emoji: null,
-                    });
+                  onPress={() => onNavigateToAddChild({ groupName, selectedIds: [...selectedChildIds], emoji })}
+                  style={{
+                    borderWidth: 1.5,
+                    borderColor: BRAND_GREEN,
+                    borderRadius: 8,
+                    borderStyle: 'dashed',
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 4,
+                    backgroundColor: 'white',
                   }}
                 >
-                  <Text className="text-green-600 text-base mr-2">+</Text>
-                  <Text className="text-green-600 text-base">{t('groups.add_child_option')}</Text>
+                  <Text style={{ fontSize: 17, color: BRAND_GREEN, lineHeight: 20 }}>+</Text>
+                  <Text style={{ fontSize: 15, color: BRAND_GREEN, fontFamily: 'Rubik' }}>{t('groups.add_child_option')}</Text>
                 </TouchableOpacity>
-              </ScrollView>
-            </View>
-            {/* White fill for nav bar area — prevents parent modal showing through */}
-            <View style={{ height: insets.bottom, backgroundColor: 'white' }} />
-          </Pressable>
-        </Pressable>
+              </View>
+
+              {/* Save button */}
+              <View style={{ alignItems: 'center', paddingBottom: 24 }}>
+                <TouchableOpacity
+                  onPress={handleCreate}
+                  disabled={!canSubmit}
+                  style={{
+                    width: 205,
+                    height: 44,
+                    borderRadius: 10,
+                    backgroundColor: canSubmit ? BRAND_GREEN : '#afafaf',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text style={{ color: canSubmit ? 'white' : '#f5f5f5', fontSize: 20, fontWeight: '600', fontFamily: 'Rubik_600SemiBold' }}>
+                      {t('checkin.save')}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
       </Modal>
+
+      {/* Emoji keyboard */}
+      <View style={{ direction: 'ltr' }}>
+        <EmojiKeyboard
+          onEmojiSelected={(e: any) => { setEmoji(e.emoji); setEmojiOpen(false); }}
+          open={emojiOpen}
+          onClose={() => setEmojiOpen(false)}
+          categoryPosition="top"
+          categoryOrder={['smileys_emotion', 'people_body', 'animals_nature', 'food_drink', 'travel_places', 'activities', 'objects', 'symbols', 'flags', 'recently_used', 'search']}
+        />
+      </View>
     </>
   );
 }
