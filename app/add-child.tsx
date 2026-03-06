@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
@@ -85,6 +85,7 @@ const BTN_SHADOW = {
 export default function AddChildScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
 
   const ITEM_H = 48;
   const VISIBLE = 5;
@@ -132,6 +133,8 @@ export default function AddChildScreen() {
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState<string | null>(null);
 
+  const canSubmit = firstName.trim().length > 0 && lastName.trim().length > 0 && dob.length > 0;
+
   async function handleSubmit() {
     const f = firstName.trim();
     const l = lastName.trim();
@@ -145,9 +148,13 @@ export default function AddChildScreen() {
     setError(null);
     setLoading(true);
     try {
-      await addChild(f, l, d);
+      const childId = await addChild(f, l, d);
       Toast.show({ type: 'success', text1: t('children.child_added_toast') });
-      router.back();
+      if (returnTo === 'create-group') {
+        router.navigate({ pathname: '/(tabs)/groups', params: { newChildId: childId } });
+      } else {
+        router.back();
+      }
     } catch (e: any) {
       setError(e.message ?? t('errors.generic'));
       setLoading(false);
@@ -300,9 +307,9 @@ export default function AddChildScreen() {
 
             <TouchableOpacity
               className="rounded-lg py-4 items-center"
-              style={{ backgroundColor: BRAND_GREEN, ...BTN_SHADOW }}
+              style={{ backgroundColor: canSubmit && !loading ? BRAND_GREEN : '#afafaf', ...(canSubmit && !loading ? BTN_SHADOW : {}) }}
               onPress={handleSubmit}
-              disabled={loading}
+              disabled={!canSubmit || loading}
             >
               {loading ? (
                 <ActivityIndicator color="white" />

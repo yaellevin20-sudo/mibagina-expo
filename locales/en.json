@@ -156,7 +156,16 @@
     "remove_selected_count": "Remove ({{count}})",
     "confirm_remove_members_title": "Remove group members",
     "confirm_remove_members_sure": "Are you sure?",
-    "confirm_remove_members_body": "The selected children will be removed from the group, and their parents will be notified."
+    "confirm_remove_members_body": "The selected children will be removed from the group, and their parents will be notified.",
+    "edit_managers_title": "Edit group managers",
+    "add_manager": "Add manager to group",
+    "add_manager_title": "Add manager to group",
+    "add_manager_invite_message": "You've been invited to manage the group '{{name}}' on 'Mi Bagina' – {{link}}\nClick the link to accept the invitation",
+    "add_manager_note": "Note — you can add up to 3 managers per group",
+    "send_invite": "Send invite",
+    "remove_manager_title": "Remove manager from group",
+    "confirm_demote_body": "This person will lose their admin permissions and will remain a regular member of the group.",
+    "demote_action": "Remove"
   },
   "auth": {
     "email": "Email",

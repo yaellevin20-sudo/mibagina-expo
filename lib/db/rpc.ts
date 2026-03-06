@@ -489,6 +489,19 @@ export async function demoteToMember(groupId: string): Promise<void> {
 }
 
 // -----------------------------------------------------------------------
+// demote_admin(p_group_id, p_guardian_id)
+// An admin demotes any admin (including themselves) to a regular member.
+// Throws if target is the last admin.
+// -----------------------------------------------------------------------
+export async function demoteAdmin(groupId: string, adminId: string): Promise<void> {
+  const { error } = await supabase.rpc('demote_admin', {
+    p_group_id:    groupId,
+    p_guardian_id: adminId,
+  });
+  if (error) throw error;
+}
+
+// -----------------------------------------------------------------------
 // get_playground_children(p_playground_id)
 // Three states:
 //   data present              → render normally

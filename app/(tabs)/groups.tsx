@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
@@ -210,14 +210,22 @@ function InlineAddChildForm({ onAdded }: { onAdded: (child: ChildRow) => void })
 // ---------------------------------------------------------------------------
 // Create Group Modal — single-step form with required child selection
 // ---------------------------------------------------------------------------
+type CreateDraft = { groupName: string; selectedIds: string[]; emoji: string | null };
+
 function CreateGroupModal({
   visible,
   onClose,
   onCreated,
+  initialDraft,
+  pendingChildId,
+  onNavigateToAddChild,
 }: {
   visible: boolean;
   onClose: () => void;
   onCreated: () => void;
+  initialDraft?: CreateDraft | null;
+  pendingChildId?: string | null;
+  onNavigateToAddChild: (draft: CreateDraft) => void;
 }) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -225,7 +233,6 @@ function CreateGroupModal({
   const [children, setChildren]             = useState<ChildRow[]>([]);
   const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set());
   const [showPicker, setShowPicker]         = useState(false);
-  const [showAddChild, setShowAddChild]     = useState(false);
   const [pendingGroupId, setPendingGroupId] = useState<string | null>(null);
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState<string | null>(null);
@@ -233,13 +240,18 @@ function CreateGroupModal({
 
   useEffect(() => {
     if (visible) {
-      setGroupName('');
-      setSelectedChildIds(new Set());
+      setGroupName(initialDraft?.groupName ?? '');
+      setSelectedChildIds(new Set(initialDraft?.selectedIds ?? []));
       setPendingGroupId(null);
       setError(null);
       setShowPicker(false);
-      setShowAddChild(false);
-      getMyChildren().then(setChildren).catch(console.error);
+      getMyChildren().then((list) => {
+        setChildren(list);
+        // Auto-select newly added child that came back from add-child screen
+        if (pendingChildId) {
+          setSelectedChildIds((prev) => new Set([...prev, pendingChildId]));
+        }
+      }).catch(console.error);
     }
   }, [visible]);
 
@@ -249,12 +261,6 @@ function CreateGroupModal({
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
-  }
-
-  function handleChildAdded(newChild: ChildRow) {
-    setChildren((prev) => [...prev, newChild]);
-    setSelectedChildIds((prev) => new Set([...prev, newChild.id]));
-    setShowAddChild(false);
   }
 
   const canSubmit = groupName.trim().length > 0 && selectedChildIds.size > 0 && !loading;
@@ -336,7 +342,6 @@ function CreateGroupModal({
                 <Text className="text-gray-400 text-sm ml-2">▼</Text>
               </TouchableOpacity>
 
-              {showAddChild && <InlineAddChildForm onAdded={handleChildAdded} />}
             </ScrollView>
 
             {/* Footer */}
@@ -406,12 +411,16 @@ function CreateGroupModal({
                   );
                 })}
 
-                {/* Add a child row */}
+                {/* Add a child row — navigates to add-child screen */}
                 <TouchableOpacity
                   className="flex-row items-center px-4 py-4"
                   onPress={() => {
                     setShowPicker(false);
-                    setShowAddChild(true);
+                    onNavigateToAddChild({
+                      groupName,
+                      selectedIds: [...selectedChildIds],
+                      emoji: null,
+                    });
                   }}
                 >
                   <Text className="text-green-600 text-base mr-2">+</Text>
@@ -796,6 +805,12 @@ export default function GroupsScreen() {
   const [showCreate, setShowCreate] = useState(false);
   const [menuOpen, setMenuOpen]     = useState(false);
 
+  // Draft state preserved when navigating to add-child screen
+  const createDraftRef        = useRef<CreateDraft | null>(null);
+  const handledChildRef       = useRef<string | null>(null);
+  const [pendingChildId, setPendingChildId] = useState<string | null>(null);
+  const { newChildId }        = useLocalSearchParams<{ newChildId?: string }>();
+
   const knownGroupsRef = useRef<Map<string, string>>(new Map());
 
   const load = useCallback(async () => {
@@ -820,8 +835,20 @@ export default function GroupsScreen() {
   useFocusEffect(
     useCallback(() => {
       load();
-    }, [load])
+      // Returning from add-child screen with a newly created child
+      if (newChildId && newChildId !== handledChildRef.current) {
+        handledChildRef.current = newChildId;
+        setPendingChildId(newChildId);
+        setShowCreate(true);
+      }
+    }, [load, newChildId])
   );
+
+  function handleNavigateToAddChild(draft: CreateDraft) {
+    createDraftRef.current = draft;
+    setShowCreate(false);
+    router.push({ pathname: '/add-child', params: { returnTo: 'create-group' } });
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f1fdf5' }}>
@@ -887,8 +914,18 @@ export default function GroupsScreen() {
       {/* Create group modal */}
       <CreateGroupModal
         visible={showCreate}
-        onClose={() => setShowCreate(false)}
-        onCreated={() => { setShowCreate(false); load(); Toast.show({ type: 'success', text1: t('groups.group_created_toast') }); }}
+        onClose={() => { setShowCreate(false); createDraftRef.current = null; setPendingChildId(null); }}
+        onCreated={() => {
+          setShowCreate(false);
+          createDraftRef.current = null;
+          setPendingChildId(null);
+          handledChildRef.current = null;
+          load();
+          Toast.show({ type: 'success', text1: t('groups.group_created_toast') });
+        }}
+        initialDraft={createDraftRef.current}
+        pendingChildId={pendingChildId}
+        onNavigateToAddChild={handleNavigateToAddChild}
       />
 
       {/* FAB — home icon, bottom-right */}

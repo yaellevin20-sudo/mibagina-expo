@@ -290,7 +290,6 @@ export default function GroupDetailScreen() {
   const [menuOpen, setMenuOpen]             = useState(false);
   const [showRename, setShowRename]         = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [editingAdmins, setEditingAdmins]   = useState(false);
 
   const isAdminBool = isAdmin === '1';
 
@@ -363,33 +362,6 @@ export default function GroupDetailScreen() {
         Alert.alert(t('errors.generic'), e.message);
       }
     }
-  }
-
-  function confirmRemoveGuardian(memberId: string, memberName: string) {
-    Alert.alert(
-      t('groups.confirm_remove_guardian', { name: memberName }),
-      '',
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.confirm'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeGuardianFromGroup(id as string, memberId);
-              loadMembers();
-            } catch (e: any) {
-              Alert.alert(
-                e.message?.includes('last admin')
-                  ? t('groups.last_admin_error')
-                  : t('errors.generic'),
-                e.message
-              );
-            }
-          },
-        },
-      ]
-    );
   }
 
   async function confirmRemoveChild(childId: string, childName: string) {
@@ -520,7 +492,7 @@ export default function GroupDetailScreen() {
               {t('groups.admins_section')}
             </Text>
             {isAdminBool && (
-              <TouchableOpacity onPress={() => setEditingAdmins((v) => !v)}>
+              <TouchableOpacity onPress={() => router.push({ pathname: '/group/edit-managers', params: { id, name: groupName, inviteToken } })}>
                 <Text style={{ fontSize: 13, fontWeight: '600', color: '#767d8b' }}>
                   {t('groups.edit')}
                 </Text>
@@ -574,16 +546,6 @@ export default function GroupDetailScreen() {
                   </View>
                 </View>
 
-                {/* Remove button (edit mode, not self) */}
-                {editingAdmins && admin.guardian_id !== user?.id && (
-                  <TouchableOpacity
-                    onPress={() => confirmRemoveGuardian(admin.guardian_id, admin.name)}
-                  >
-                    <Text style={{ color: '#ef4444', fontSize: 13 }}>
-                      {t('children.remove_child')}
-                    </Text>
-                  </TouchableOpacity>
-                )}
               </View>
             ))
           )}

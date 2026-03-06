@@ -155,7 +155,16 @@
     "remove_selected_count": "הסרה ({{count}})",
     "confirm_remove_members_title": "הסרת חברי קבוצה",
     "confirm_remove_members_sure": "האם אתם בטוחים?",
-    "confirm_remove_members_body": "הילדים שנבחרו יוסרו מהקבוצה, והוריהם יקבלו על כך התראה."
+    "confirm_remove_members_body": "הילדים שנבחרו יוסרו מהקבוצה, והוריהם יקבלו על כך התראה.",
+    "edit_managers_title": "עריכת מנהלי קבוצה",
+    "add_manager": "הוסף מנהל לקבוצה",
+    "add_manager_title": "הוספת מנהל לקבוצה",
+    "add_manager_invite_message": "הוזמנת לנהל את הקבוצה ׳{{name}}׳ באפליקציית ׳מי בגינה׳ – {{link}}\nלחץ על הלינק כדי לקבל את ההזמנה",
+    "add_manager_note": "שימו לב — ניתן להוסיף עד 3 מנהלים לקבוצה",
+    "send_invite": "שלח הזמנה",
+    "remove_manager_title": "הסרת מנהל מהקבוצה",
+    "confirm_demote_body": "אדם זה יאבד את הרשאות הניהול שלו ויישאר חבר רגיל בקבוצה.",
+    "demote_action": "הסרה"
   },
   "auth": {
     "email": "אימייל",
