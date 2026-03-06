@@ -499,7 +499,7 @@ export default function GroupDetailScreen() {
           {groupName}
         </Text>
         <Text style={{ fontSize: 14, fontWeight: '500', color: '#555', marginTop: 2 }}>
-          {t('groups.member_count', { count: loading && members.length === 0 ? Number(memberCount ?? 0) : members.length })}
+          {t('groups.member_count', { count: loading && members.length === 0 ? Number(memberCount ?? 0) : allChildren.length })}
         </Text>
       </View>
 
@@ -779,13 +779,19 @@ export default function GroupDetailScreen() {
         onClose={() => setShowRename(false)}
         onSave={async (name, newEmoji) => {
           const oldName = groupName;
-          await renameGroup(id as string, name);
-          if (newEmoji !== savedEmoji) await setGroupEmojiRpc(id as string, newEmoji);
+          const nameChanged = name !== oldName;
+          const emojiChanged = newEmoji !== savedEmoji;
+          if (nameChanged) await renameGroup(id as string, name);
+          if (emojiChanged) await setGroupEmojiRpc(id as string, newEmoji);
           setGroupName(name);
           setSavedEmoji(newEmoji);
           setShowRename(false);
-          Toast.show({ text1: t('groups.renamed_toast', { name }) });
-          if (name !== oldName) notifyGroupRenamed(id as string, oldName, name);
+          if (nameChanged) {
+            Toast.show({ text1: t('groups.renamed_toast', { name }) });
+            notifyGroupRenamed(id as string, oldName, name);
+          } else if (emojiChanged) {
+            Toast.show({ text1: t('groups.emoji_updated_toast') });
+          }
         }}
       />
 

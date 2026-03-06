@@ -177,43 +177,100 @@
     .gc:hover .chevron { background: #e9eaec; }
     .gc.expanded .chevron { transform: rotate(180deg); }
 
-    .gc-body { display: none; padding: 4px 16px 14px; border-top: 1px solid #f3f4f6; }
+    .gc-body { display: none; border-top: 1px solid #f3f4f6; }
     .gc.expanded .gc-body { display: block; }
 
-    /* ── Family row (collapsible) ── */
-    .family { padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
-    .family:last-child { border-bottom: none; }
+    /* ── Playground sub-section ── */
+    .pg-section { border-bottom: 1px solid #f0f0f0; }
+    .pg-section:last-child { border-bottom: none; }
 
-    /* Family header row: RTL flex — name RIGHT (first), chevron LEFT (last) */
-    .fam-header {
+    /* RTL: name RIGHT (first), count + chevron LEFT (last) */
+    .pg-header {
       display: flex; align-items: center; gap: 8px;
-      cursor: pointer; user-select: none; margin-bottom: 3px;
+      padding: 10px 16px 8px; cursor: pointer; user-select: none;
     }
-    .fam-name { font-size: 14px; font-weight: 500; color: #1a1a1a; flex: 1; }
-    .fam-name span { font-weight: 400; color: #555; }
-    .fam-chevron {
-      width: 22px; height: 22px; background: #f3f4f6;
+    .pg-icon {
+      font-size: 13px; flex-shrink: 0; opacity: 0.7;
+    }
+    .pg-name {
+      font-size: 13px; font-weight: 600;
+      color: #3D7A50; letter-spacing: 0.01em; flex-shrink: 0;
+    }
+    .pg-count {
+      font-size: 11px; font-weight: 500; color: #767d8b;
+      background: #f3f4f6; border-radius: 10px;
+      padding: 2px 8px; flex-shrink: 0;
+    }
+    .pg-spacer { flex: 1; }
+    .pg-chevron {
+      width: 20px; height: 20px; background: #f3f4f6;
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; transition: transform 0.2s;
     }
-    .family.fam-open .fam-chevron { transform: rotate(180deg); }
+    .pg-section.pg-collapsed .pg-chevron { transform: rotate(180deg); }
 
-    .fam-meta { font-size: 12px; color: #767d8b; margin-bottom: 2px; }
+    .pg-children { }
+    .pg-section.pg-collapsed .pg-children { display: none; }
 
-    .fam-children { display: none; padding-right: 4px; margin-top: 6px; }
-    .family.fam-open .fam-children { display: block; }
+    /* ── Family group within a playground ── */
+    .fam-group { border-top: 1px solid #f8f8f8; }
+    .fam-group:first-child { border-top: none; }
 
-    /* Inside family: names bold, ages regular */
-    .fam-child { font-size: 13px; color: #374151; line-height: 1.8; }
-    .fam-child strong { font-weight: 600; }
-    .fam-child span   { font-weight: 400; }
+    .fam-group-header {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 16px; cursor: pointer; user-select: none;
+    }
+    .fam-group-info { flex: 1; }
+    .fam-group-name {
+      font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 2px;
+    }
+    .fam-group-name .fam-count { font-weight: 400; color: #767d8b; }
+    .fam-group-meta { font-size: 12px; color: #9ca3af; }
+    .fam-group-meta .guardian { color: #555; font-weight: 500; }
+    .fam-group-chevron {
+      width: 20px; height: 20px; background: #f3f4f6; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px; transition: transform 0.2s;
+    }
+    .fam-group.fam-open .fam-group-chevron { transform: rotate(180deg); }
+    .fam-group-time {
+      font-size: 11px; font-weight: 500; color: #b0b4bb;
+      flex-shrink: 0; padding-top: 3px; white-space: nowrap;
+    }
 
-    /* Simple family row (non-collapsible) */
-    .family-simple { padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
-    .family-simple:last-child { border-bottom: none; }
-    .fsim-name { font-size: 14px; font-weight: 500; color: #1a1a1a; }
-    .fsim-name span { font-weight: 400; color: #555; }
-    .fsim-meta { font-size: 12px; color: #767d8b; margin-top: 2px; }
+    .fam-group-children { display: none; padding: 0 16px 8px 16px; }
+    .fam-group.fam-open .fam-group-children { display: block; }
+    .fam-child-item {
+      font-size: 13px; color: #374151; line-height: 1.9; padding-right: 4px;
+    }
+    .fam-child-item strong { font-weight: 600; }
+    .fam-child-item span { font-weight: 400; color: #9ca3af; }
+
+    /* ── Child row ── */
+    /* RTL: name RIGHT (first), meta LEFT (last) */
+    .child-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 16px;
+      border-top: 1px solid #f8f8f8;
+    }
+    .child-row:first-of-type { border-top: none; }
+
+    .child-info { flex: 1; }
+    .child-name {
+      font-size: 14px; font-weight: 500; color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+    .child-name .child-age {
+      font-weight: 400; color: #767d8b; font-size: 13px;
+    }
+    .child-meta {
+      font-size: 12px; color: #9ca3af; line-height: 1.5;
+    }
+    .child-meta .guardian { color: #555; font-weight: 500; }
+    .child-time {
+      font-size: 11px; font-weight: 500; color: #b0b4bb;
+      flex-shrink: 0; padding-top: 3px; white-space: nowrap;
+    }
 
     /* ── Check-in form ── */
     /* RTL: back btn = first-child → physical RIGHT (leading) */
@@ -343,6 +400,142 @@
 
     /* ── Footer ── */
     .footer { font-size: 12px; color: #666; direction: ltr; letter-spacing: 0.04em; }
+
+    /* ── Modal backdrop ── */
+    .modal-bg {
+      position: relative; min-height: 812px;
+      background: linear-gradient(180deg, #ffffff 0%, #F1FDF5 100%);
+      overflow: hidden;
+    }
+    .modal-backdrop {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.42); z-index: 50;
+      display: flex; align-items: flex-end;
+    }
+    .modal-backdrop.centered { align-items: center; justify-content: center; }
+
+    /* ── Bottom sheet ── */
+    .bottom-sheet {
+      width: 100%; background: white;
+      border-radius: 20px 20px 0 0;
+      padding-bottom: 24px;
+    }
+    .sheet-handle {
+      width: 36px; height: 4px; background: #d1d5db; border-radius: 2px;
+      margin: 12px auto 0;
+    }
+    .sheet-title {
+      font-size: 17px; font-weight: 600; color: #1a1a1a;
+      padding: 16px 20px 14px; text-align: center;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .pg-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 15px 20px; cursor: pointer; transition: background 0.1s;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .pg-row:last-child { border-bottom: none; }
+    .pg-row:hover { background: #f9fafb; }
+    .pg-row.pg-current { pointer-events: none; }
+    .pg-row-name { flex: 1; font-size: 15px; color: #1a1a1a; font-weight: 400; }
+    .pg-row.pg-current .pg-row-name { color: #9ca3af; }
+    .pg-row-badge {
+      font-size: 11px; font-weight: 500; color: #3D7A50;
+      background: #E4F2EA; border-radius: 8px; padding: 2px 8px; flex-shrink: 0;
+    }
+    .pg-row-add { color: #3D7A50; font-weight: 500; }
+    .plus-circle {
+      width: 26px; height: 26px; background: #E4F2EA; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; font-weight: 700; color: #3D7A50; flex-shrink: 0;
+    }
+    .sheet-add-form {
+      display: none; padding: 8px 20px 4px;
+      gap: 8px; direction: ltr; align-items: center;
+    }
+    .sheet-add-form.visible { display: flex; }
+    .sheet-add-input {
+      flex: 1; border: 1.5px solid #d1d5db; border-radius: 8px;
+      padding: 8px 12px; font-family: 'Rubik', sans-serif; font-size: 14px;
+      outline: none; direction: rtl; transition: border-color 0.15s;
+    }
+    .sheet-add-input:focus { border-color: #3D7A50; }
+    .sheet-add-confirm {
+      background: #3D7A50; color: white; border: none; border-radius: 8px;
+      padding: 8px 14px; font-family: 'Rubik', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .sheet-cancel {
+      margin: 14px 20px 0; padding: 14px; text-align: center;
+      font-size: 15px; font-weight: 500; color: #6b7280;
+      border: 1.5px solid #e9eaec; border-radius: 12px; cursor: pointer;
+      transition: background 0.1s;
+    }
+    .sheet-cancel:hover { background: #f9fafb; }
+
+    /* ── Confirm modal (centered) ── */
+    .confirm-modal {
+      background: white; border-radius: 18px;
+      width: calc(100% - 48px); padding: 28px 24px 22px;
+      text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+    }
+    .confirm-icon { font-size: 38px; margin-bottom: 14px; display: block; }
+    .confirm-title {
+      font-size: 19px; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 8px; line-height: 1.4;
+    }
+    .confirm-sub {
+      font-size: 14px; color: #767d8b;
+      margin-bottom: 24px; line-height: 1.55;
+    }
+    .confirm-actions { display: flex; gap: 10px; }
+    .btn-cancel-soft {
+      flex: 1; background: white; color: #374151;
+      border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 14px;
+      font-family: 'Rubik', sans-serif; font-size: 15px; font-weight: 500;
+      cursor: pointer; transition: background 0.1s;
+    }
+    .btn-cancel-soft:hover { background: #f9fafb; }
+    .btn-leave {
+      flex: 1; background: #dc2626; color: white; border: none;
+      border-radius: 12px; padding: 14px;
+      font-family: 'Rubik', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-leave:hover { background: #b91c1c; }
+
+    /* ── Onboarding empty states ── */
+    .ob-empty {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 8px 24px 32px; text-align: center;
+    }
+    .ob-quote {
+      font-size: 22px; font-weight: 700; color: #1a1a1a;
+      line-height: 1.35; margin-bottom: 20px;
+    }
+    .fence-illo {
+      margin-bottom: 22px;
+    }
+    .ob-body {
+      font-size: 16px; color: #4a4a4a;
+      line-height: 1.55; margin-bottom: 32px;
+    }
+    .ob-actions {
+      display: flex; gap: 10px; width: 100%;
+    }
+    .ob-actions.single { flex-direction: column; }
+    .btn-ob {
+      flex: 1; background: #3D7A50; color: white;
+      border: 1.5px solid #3D7A50; border-radius: 12px; padding: 15px 12px;
+      font-family: 'Rubik', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; text-align: center; transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .btn-ob:hover { background: #2D6040; }
+    .btn-ob.outline {
+      background: white; color: #3D7A50;
+    }
+    .btn-ob.outline:hover { background: #E4F2EA; }
   </style>
 </head>
 <body>
@@ -352,6 +545,10 @@
     <button class="tab active" data-s="home-empty">🏠 בית — ריק</button>
     <button class="tab"        data-s="home-active">🏠 בית — פעיל</button>
     <button class="tab"        data-s="checkin">הוספת ביקור</button>
+    <button class="tab"        data-s="home-no-children">🏠 אין ילדים / קבוצות</button>
+    <button class="tab"        data-s="home-no-groups">🏠 אין קבוצות</button>
+    <button class="tab"        data-s="switch-pg">🔄 שינוי גינה</button>
+    <button class="tab"        data-s="end-visit">🚪 סיום ביקור</button>
   </div>
 
   <div class="phone-shell">
@@ -459,12 +656,11 @@
           <!-- Group cards -->
           <div class="groups">
 
-            <!-- Group 1: 🐦 גן כחל — starts expanded -->
+            <!-- Group 1: 🐦 גן כחל — starts expanded, children at 2 playgrounds -->
             <div class="gc expanded" id="gc1">
               <div class="gc-header" onclick="toggleGC('gc1')">
-                <!-- RTL: emoji RIGHT (first), name middle, chevron LEFT (last) -->
                 <div class="gc-emoji">🐦</div>
-                <div class="gc-name">גן כחל · 3 ילדים בגינה</div>
+                <div class="gc-name">גן כחל · 7 ילדים בגינה</div>
                 <div class="chevron">
                   <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
                     <path d="M1 1.5L6 6.5L11 1.5" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -473,38 +669,97 @@
               </div>
               <div class="gc-body">
 
-                <!-- ── משפחת כרמלי — collapsible ── -->
-                <div class="family fam-open" id="fam1">
-                  <!-- RTL: name RIGHT (first), chevron LEFT (last) -->
-                  <div class="fam-header" onclick="toggleFam('fam1')">
-                    <div class="fam-name">משפחת כרמלי <span>(5 ילדים)</span></div>
-                    <div class="fam-chevron">
+                <!-- Playground 1 -->
+                <div class="pg-section" id="pg1">
+                  <div class="pg-header" onclick="togglePG('pg1')">
+                    <span class="pg-icon">📍</span>
+                    <span class="pg-name">גינת חנה רובינא</span>
+                    <span class="pg-count">5 ילדים</span>
+                    <div class="pg-spacer"></div>
+                    <div class="pg-chevron">
                       <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
                         <path d="M1 1L5 5.5L9 1" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
                     </div>
                   </div>
-                  <div class="fam-meta">עם אמא יעל · לפני 45 דק׳</div>
-                  <!-- Children: names bold, ages regular -->
-                  <div class="fam-children">
-                    <div class="fam-child"><strong>גור</strong> <span>(בן 1)</span></div>
-                    <div class="fam-child"><strong>עוז</strong> <span>(בן 4)</span></div>
-                    <div class="fam-child"><strong>לביא</strong> <span>(בן 4)</span></div>
-                    <div class="fam-child"><strong>יונתן</strong> <span>(בן 7)</span></div>
-                    <div class="fam-child"><strong>נועה</strong> <span>(בת 12)</span></div>
+                  <div class="pg-children">
+                    <!-- משפחת כרמלי — 3 siblings, collapsible -->
+                    <div class="fam-group fam-open" id="fam1">
+                      <div class="fam-group-header" onclick="toggleFamGroup('fam1')">
+                        <div class="fam-group-info">
+                          <div class="fam-group-name">משפחת כרמלי <span class="fam-count">(3 ילדים)</span></div>
+                          <div class="fam-group-meta"><span class="guardian">עם אמא יעל</span></div>
+                        </div>
+                        <div class="fam-group-time">לפני 45 דק׳</div>
+                        <div class="fam-group-chevron">
+                          <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                            <path d="M1 1L5 5.5L9 1" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="fam-group-children">
+                        <div class="fam-child-item"><strong>גור</strong> <span>(בן 1)</span></div>
+                        <div class="fam-child-item"><strong>עוז</strong> <span>(בן 4)</span></div>
+                        <div class="fam-child-item"><strong>לביא</strong> <span>(בן 4)</span></div>
+                      </div>
+                    </div>
+                    <!-- עילאי ספונדר — single child -->
+                    <div class="fam-group">
+                      <div class="fam-group-header" style="cursor:default">
+                        <div class="fam-group-info">
+                          <div class="fam-group-name">עילאי ספונדר <span class="fam-count">(בן 4)</span></div>
+                          <div class="fam-group-meta"><span class="guardian">עם מלווה</span></div>
+                        </div>
+                        <div class="fam-group-time">לפני שעה ו-20 דק׳</div>
+                      </div>
+                    </div>
+                    <!-- איתי סנדלר — single child -->
+                    <div class="fam-group">
+                      <div class="fam-group-header" style="cursor:default">
+                        <div class="fam-group-info">
+                          <div class="fam-group-name">איתי סנדלר <span class="fam-count">(בן 5)</span></div>
+                          <div class="fam-group-meta"><span class="guardian">עם אבא שאול</span></div>
+                        </div>
+                        <div class="fam-group-time">לפני 7 דק׳</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <!-- עילאי ספונדר — simple row -->
-                <div class="family-simple">
-                  <div class="fsim-name">עילאי ספונדר <span>(בן 4)</span></div>
-                  <div class="fsim-meta">עם מלווה · לפני שעה ו-20 דק׳</div>
-                </div>
-
-                <!-- איתי סנדלר — simple row -->
-                <div class="family-simple">
-                  <div class="fsim-name">איתי סנדלר <span>(בן 5)</span></div>
-                  <div class="fsim-meta">עם אבא שאול · לפני 7 דק׳</div>
+                <!-- Playground 2 -->
+                <div class="pg-section" id="pg2">
+                  <div class="pg-header" onclick="togglePG('pg2')">
+                    <span class="pg-icon">📍</span>
+                    <span class="pg-name">גינת הניצנים</span>
+                    <span class="pg-count">2 ילדים</span>
+                    <div class="pg-spacer"></div>
+                    <div class="pg-chevron">
+                      <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                        <path d="M1 1L5 5.5L9 1" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="pg-children">
+                    <!-- משפחת כרמלי — 2 siblings with dad -->
+                    <div class="fam-group fam-open" id="fam2">
+                      <div class="fam-group-header" onclick="toggleFamGroup('fam2')">
+                        <div class="fam-group-info">
+                          <div class="fam-group-name">משפחת כרמלי <span class="fam-count">(2 ילדים)</span></div>
+                          <div class="fam-group-meta"><span class="guardian">עם אבא דן</span></div>
+                        </div>
+                        <div class="fam-group-time">לפני 12 דק׳</div>
+                        <div class="fam-group-chevron">
+                          <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                            <path d="M1 1L5 5.5L9 1" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="fam-group-children">
+                        <div class="fam-child-item"><strong>יונתן</strong> <span>(בן 7)</span></div>
+                        <div class="fam-child-item"><strong>נועה</strong> <span>(בת 12)</span></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
               </div>
@@ -522,9 +777,29 @@
                 </div>
               </div>
               <div class="gc-body">
-                <div class="family-simple">
-                  <div class="fsim-name">יוסי לוי <span>(בן 6)</span></div>
-                  <div class="fsim-meta">עם אמא מיכל · לפני 12 דק׳</div>
+                <div class="pg-section" id="pg3">
+                  <div class="pg-header" onclick="togglePG('pg3')">
+                    <span class="pg-icon">📍</span>
+                    <span class="pg-name">גינת הפרלמנט</span>
+                    <span class="pg-count">ילד אחד</span>
+                    <div class="pg-spacer"></div>
+                    <div class="pg-chevron">
+                      <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                        <path d="M1 1L5 5.5L9 1" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="pg-children">
+                    <div class="fam-group">
+                      <div class="fam-group-header" style="cursor:default">
+                        <div class="fam-group-info">
+                          <div class="fam-group-name">יוסי לוי <span class="fam-count">(בן 6)</span></div>
+                          <div class="fam-group-meta"><span class="guardian">עם אמא מיכל</span></div>
+                        </div>
+                        <div class="fam-group-time">לפני 12 דק׳</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -622,6 +897,178 @@
         </div>
       </div>
 
+      <!-- ══════════════ HOME — NO CHILDREN / NO GROUPS ══════════════ -->
+      <div class="screen" id="s-home-no-children">
+        <div class="bg">
+          <div style="height:44px"></div>
+          <div class="app-header">
+            <div class="hdr-title">מי בגינה 🌳</div>
+            <div class="hdr-gap"></div>
+            <div class="hdr-menu"><span></span><span></span><span></span></div>
+          </div>
+          <div class="greeting">
+            <div class="greeting-name">שלום, יעל 👋</div>
+            <div class="greeting-sub">מי בגינה היום?</div>
+          </div>
+          <div class="ob-empty">
+            <div class="ob-quote">"זה לא כל כך נעים<br>לראות גן סגור..."</div>
+            <!-- Fence illustration -->
+            <div class="fence-illo">
+              <img src="assets/fence.png" width="200" style="object-fit:contain" alt="fence"/>
+            </div>
+            <div class="ob-body">כדי לראות מי בגינה, צריך להוסיף ילדים ולהצטרף לקבוצה</div>
+            <div class="ob-actions">
+              <!-- RTL: first in DOM = right side; second = left side -->
+              <button class="btn-ob">הוספת ילד</button>
+              <button class="btn-ob outline">הוספת קבוצה</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ HOME — NO GROUPS (has children) ══════════════ -->
+      <div class="screen" id="s-home-no-groups">
+        <div class="bg">
+          <div style="height:44px"></div>
+          <div class="app-header">
+            <div class="hdr-title">מי בגינה 🌳</div>
+            <div class="hdr-gap"></div>
+            <div class="hdr-menu"><span></span><span></span><span></span></div>
+          </div>
+          <div class="greeting">
+            <div class="greeting-name">שלום, יעל 👋</div>
+            <div class="greeting-sub">מי בגינה היום?</div>
+          </div>
+          <div class="ob-empty">
+            <div class="ob-quote">"זה לא כל כך נעים<br>לראות גן סגור..."</div>
+            <!-- Fence illustration (same) -->
+            <div class="fence-illo">
+              <img src="assets/fence.png" width="200" style="object-fit:contain" alt="fence"/>
+            </div>
+            <div class="ob-body">כדי לראות מי בגינה, צריך להצטרף לקבוצה קיימת או להקים קבוצה חדשה</div>
+            <div class="ob-actions single">
+              <button class="btn-ob">הוספת קבוצה</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ SWITCH PLAYGROUND MODAL ══════════════ -->
+      <div class="screen" id="s-switch-pg">
+        <div class="modal-bg">
+          <div style="height:44px"></div>
+          <!-- Dimmed background content -->
+          <div style="opacity:0.45; pointer-events:none;">
+            <div class="app-header">
+              <div class="hdr-title">מי בגינה 🌳</div>
+              <div class="hdr-gap"></div>
+              <div class="hdr-menu"><span></span><span></span><span></span></div>
+            </div>
+            <div class="greeting">
+              <div class="greeting-name">שלום, יעל 👋</div>
+              <div class="greeting-sub">מי בגינה היום?</div>
+            </div>
+            <div class="active-card">
+              <div class="active-card-inner">
+                <div class="active-desc">גור, עוז ולביא בגינת חנה רובינא</div>
+                <div class="active-meta"><span class="orange-time">לפני 30 דקות</span></div>
+                <div class="active-actions">
+                  <button class="btn-switch">שינוי גינה</button>
+                  <button class="btn-end">סיום ביקור</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Centered popup overlay -->
+          <div class="modal-backdrop centered">
+            <div class="confirm-modal" style="padding: 0; overflow: hidden; text-align: right;">
+              <div style="padding: 20px 20px 16px; border-bottom: 1px solid #f3f4f6;">
+                <div style="font-size: 17px; font-weight: 700; color: #1a1a1a; text-align: center;">לאיזה גינה עוברים?</div>
+              </div>
+
+              <!-- Current playground (disabled) -->
+              <div class="pg-row pg-current">
+                <span style="font-size:14px">📍</span>
+                <span class="pg-row-name">גינת חנה רובינא</span>
+                <span class="pg-row-badge">כאן עכשיו</span>
+              </div>
+
+              <!-- Other playgrounds -->
+              <div class="pg-row" onclick="pickSheetPG(this, 'גינת הניצנים')">
+                <span style="font-size:14px; opacity:0.5">📍</span>
+                <span class="pg-row-name">גינת הניצנים</span>
+              </div>
+              <div class="pg-row" onclick="pickSheetPG(this, 'גינת הפרלמנט')">
+                <span style="font-size:14px; opacity:0.5">📍</span>
+                <span class="pg-row-name">גינת הפרלמנט</span>
+              </div>
+
+              <!-- Add new playground -->
+              <div class="pg-row pg-row-add" style="border-bottom: none;" onclick="toggleSheetAdd()">
+                <div class="plus-circle">+</div>
+                <span class="pg-row-name pg-row-add">הוספת גינה חדשה</span>
+              </div>
+
+              <!-- Inline add form -->
+              <div class="sheet-add-form" id="sheet-add-form">
+                <button class="sheet-add-confirm" onclick="confirmSheetAdd()">הוסף</button>
+                <input class="sheet-add-input" id="sheet-add-input" type="text" placeholder="שם הגינה"
+                  onkeydown="if(event.key==='Enter') confirmSheetAdd()">
+              </div>
+
+              <div style="padding: 4px 0; border-top: 1px solid #f3f4f6; display: flex;">
+                <button onclick="switchScreen('home-active')" style="flex:1; background:none; border:none; border-left: 1px solid #f3f4f6; padding: 14px; font-family:'Rubik',sans-serif; font-size:15px; font-weight:500; color:#6b7280; cursor:pointer;">ביטול</button>
+                <button onclick="switchScreen('home-active')" style="flex:1; background:none; border:none; padding: 14px; font-family:'Rubik',sans-serif; font-size:15px; font-weight:600; color:#3D7A50; cursor:pointer;">שמירה</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ END VISIT CONFIRM MODAL ══════════════ -->
+      <div class="screen" id="s-end-visit">
+        <div class="modal-bg">
+          <div style="height:44px"></div>
+          <!-- Dimmed background content -->
+          <div style="opacity:0.45; pointer-events:none;">
+            <div class="app-header">
+              <div class="hdr-title">מי בגינה 🌳</div>
+              <div class="hdr-gap"></div>
+              <div class="hdr-menu"><span></span><span></span><span></span></div>
+            </div>
+            <div class="greeting">
+              <div class="greeting-name">שלום, יעל 👋</div>
+              <div class="greeting-sub">מי בגינה היום?</div>
+            </div>
+            <div class="active-card">
+              <div class="active-card-inner">
+                <div class="active-desc">גור, עוז ולביא בגינת חנה רובינא</div>
+                <div class="active-meta"><span class="orange-time">לפני 30 דקות</span></div>
+                <div class="active-actions">
+                  <button class="btn-switch">שינוי גינה</button>
+                  <button class="btn-end">סיום ביקור</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Centered confirm modal -->
+          <div class="modal-backdrop centered">
+            <div class="confirm-modal">
+              <span class="confirm-icon">👋</span>
+              <div class="confirm-title">לצאת מגינת חנה רובינא?</div>
+              <div class="confirm-sub">הביקור של גור, עוז ולביא יסתיים</div>
+              <div class="confirm-actions">
+                <!-- RTL: first = right (cancel), second = left (destructive) -->
+                <button class="btn-cancel-soft" onclick="switchScreen('home-active')">עדיין לא</button>
+                <button class="btn-leave" onclick="switchScreen('home-empty')">כן, יוצאים</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /phone-screen -->
   </div><!-- /phone-shell -->
 
@@ -642,8 +1089,11 @@
     // ── Group card accordion ─────────────────────────────────────────────────
     function toggleGC(id) { document.getElementById(id).classList.toggle('expanded'); }
 
-    // ── Family row collapse ──────────────────────────────────────────────────
-    function toggleFam(id) { document.getElementById(id).classList.toggle('fam-open'); }
+    // ── Playground section collapse ──────────────────────────────────────────
+    function togglePG(id) { document.getElementById(id).classList.toggle('pg-collapsed'); }
+
+    // ── Family group collapse ─────────────────────────────────────────────────
+    function toggleFamGroup(id) { document.getElementById(id).classList.toggle('fam-open'); }
 
     // ── Chips: all start unselected (green outline, no fill) ─────────────────
     const selected = new Set();
@@ -722,6 +1172,33 @@
       pickPG(name);
       input.value = '';
       document.getElementById('add-pg-form').classList.remove('visible');
+    }
+
+    // ── Switch-PG sheet ──────────────────────────────────────────────────────
+    function pickSheetPG(el, name) {
+      document.querySelectorAll('#s-switch-pg .pg-row:not(.pg-current):not(.pg-row-add)').forEach(r => {
+        r.style.fontWeight = '400';
+        r.querySelector('.pg-row-name').style.color = '#1a1a1a';
+        const chk = r.querySelector('.pg-selected');
+        if (chk) chk.remove();
+      });
+      const name_el = el.querySelector('.pg-row-name');
+      name_el.style.color = '#3D7A50';
+      name_el.style.fontWeight = '600';
+    }
+    function toggleSheetAdd() {
+      const form = document.getElementById('sheet-add-form');
+      form.classList.toggle('visible');
+      if (form.classList.contains('visible'))
+        setTimeout(() => document.getElementById('sheet-add-input').focus(), 50);
+    }
+    function confirmSheetAdd() {
+      const input = document.getElementById('sheet-add-input');
+      const name = input.value.trim();
+      if (!name) return;
+      input.value = '';
+      document.getElementById('sheet-add-form').classList.remove('visible');
+      switchScreen('home-active');
     }
 
     // ── Save button enable ───────────────────────────────────────────────────

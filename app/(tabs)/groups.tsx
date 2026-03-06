@@ -744,7 +744,7 @@ function GroupCard({
             name: group.name,
             emoji: group.emoji ?? '',
             isAdmin: group.is_admin ? '1' : '0',
-            memberCount: String(group.member_count),
+            memberCount: String(group.child_count),
             inviteToken: group.invite_token,
           },
         })
